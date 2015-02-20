@@ -4,34 +4,31 @@
 #include <wait.h>
 #include "shell.h"
 
-char *infile, *outfile, *appfile;
-struct command cmds[MAXCMDS];
-char bkgrnd;
+#define DEBUG
 
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     register int i;
     char line[2048];      /*  allow large command lines  */
     int ncmds;
     char prompt[200];      /* shell prompt */
+    Context cntx;
 
     /* PLACE SIGNAL CODE HERE */
 
-    sprintf(prompt,"[%s] >", argv[0]);
+    sprintf(prompt,"[%s]> ", argv[0]);
 
-    while (promptline(prompt, line, sizeof(line)) > 0) {    /*
-il eof  */
-        if ((ncmds = parseline(line)) <= 0)
+    while (promptline(prompt, line, sizeof(line)) > 0) {    /* il eof  */
+        if ((ncmds = parseline(&cntx, line)) <= 0)
             continue;   /* read next line */
 #ifdef DEBUG
         {
             int i, j;
             for (i = 0; i < ncmds; i++) {
-                for (j = 0; cmds[i].cmdargs[j] != (char *) NULL; j++)
+                for (j = 0; cntx.cmds[i].cmdargs[j] != (char *) NULL; j++)
                     fprintf(stderr, "cmd[%d].cmdargs[%d] = %s\n",
-                            i, j, cmds[i].cmdargs[j]);
+                            i, j, cntx.cmds[i].cmdargs[j]);
                 fprintf(stderr, "cmds[%d].cmdflag = %o\n", i,
-                        s[i].cmdflag);
+                        cntx.cmds[i].cmdflag);
             }
         }
 #endif
@@ -43,6 +40,7 @@ il eof  */
         }
 
     }  /* close while */
+    return 0;
 }
 
 /* PLACE SIGNAL CODE HERE */

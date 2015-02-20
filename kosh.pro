@@ -6,7 +6,8 @@ CONFIG -= qt
 SOURCES += \
     shell.c \
     parseline.c \
-    promtline.c
+    promptline.c \
+    context.c
 
 include(deployment.pri)
 qtcAddDeployment()

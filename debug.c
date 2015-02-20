@@ -22,10 +22,10 @@ void printContext(Context *cntx) {
     int i = 0;
 
     printf("Files:\n");
-    printTest("In : `%s`\n", cntx->infile);
-    printTest("Out: `%s`\n", cntx->outfile);
-    printTest("App: `%s`\n", cntx->appfile);
-    printf("Background: %s\n", cntx->bkgrnd ? "Yes" : "No");
+//    printTest("In : `%s`\n", cntx->infile);
+//    printTest("Out: `%s`\n", cntx->outfile);
+//    printTest("App: `%s`\n", cntx->appfile);
+//    printf("Background: %s\n", cntx->bkgrnd ? "Yes" : "No");
 
     for (i = 0; i < cntx->ncmds; i++) {
         printCommand(&cntx->cmds[i]);

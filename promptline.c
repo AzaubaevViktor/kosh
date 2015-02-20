@@ -18,7 +18,7 @@ int promptline(Context *cntx, char *line, int sizline) {
 
     write(1, prompt, strlen(prompt));
     while (1) {
-        n += read(0, (line + n), sizline-n);
+        n += read(0, (line + n), sizline - n);
         *(line+n) = '\0';
 
         if (*(line+n-2) == '\\' && *(line+n-1) == '\n') {

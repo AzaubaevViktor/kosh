@@ -1,17 +1,23 @@
-
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdbool.h>
 #include "shell.h"
-char *rightShift(char *str);
-char *findQuote(char *str, char quote);
-static char *blankskip(register char *);
+#include "tokenizer.h"
+
+/* ========================== PARSER ========================== */
+
+#define curCmd (cntx->cmds[ncmds])
+#define nextCmd (cntx->cmds[ncmds + 1])
+#define curArg (curCmd.cmdargs[nargs])
+#define nextArg (curCmd.cmdargs[nargs + 1])
+#define newCmd() {curArg = (char *) NULL; nargs = 0; ncmds++;}
 
 int parseline(Context *cntx, char *line)
 {
     int nargs, ncmds;
     register char *s;
-    char aflg = 0;
+    char isAppendFlg = 0;
     int rval;
     register int i;
     static char delim[] = " \t|&<>;\n";
@@ -23,94 +29,14 @@ int parseline(Context *cntx, char *line)
 
     contextNull(cntx);
 
-    while (*s) {        /* until line has been parsed */
-        s = blankskip(s);       /*  skip white space */
-        if (!*s) break; /*  done with line */
+    TokensLine tLine;
 
-        /*  handle <, >, |, &, and ;  */
-        switch(*s) {
-        case '&':
-            ++(cntx->bkgrnd);
-            *s++ = '\0';
-            break;
-        case '>':
-            if (*(s+1) == '>') {
-                ++aflg;
-                *s++ = '\0';
-            }
-            *s++ = '\0';
-            s = blankskip(s);
-            if (!*s) {
-                fprintf(stderr, "syntax error\n");
-                return(-1);
-            }
+    clearTokensLine(&tLine);
 
-            if (aflg)
-                cntx->appfile = s;
-            else
-                cntx->outfile = s;
-            s = strpbrk(s, delim);
-            if (isspace(*s))
-                *s++ = '\0';
-            break;
-        case '<':
-            *s++ = '\0';
-            s = blankskip(s);
-            if (!*s) {
-                fprintf(stderr, "syntax error\n");
-                return(-1);
-            }
-            cntx->infile = s;
-            s = strpbrk(s, delim);
-            if (isspace(*s))
-                *s++ = '\0';
-            break;
-        case '|':
-            if (nargs == 0) {
-                fprintf(stderr, "syntax error\n");
-                return(-1);
-            }
-            cntx->cmds[ncmds++].cmdflag |= OUTPIP;
-            cntx->cmds[ncmds].cmdflag |= INPIP;
-            *s++ = '\0';
-            nargs = 0;
-            break;
-        case ';':
-            *s++ = '\0';
-            ++ncmds;
-            nargs = 0;
-            break;
-        case '\"':
-            quote = '\"';
-        case '\'':
-            quote = !quote ? '\'' : quote;
+    tokenizer(&tLine, line);
 
-            cntx->cmds[ncmds].cmdargs[nargs++] = s;
-            cntx->cmds[ncmds].cmdargs[nargs] = (char *) NULL;
+    printTokensLine(&tLine);
 
-            s = findQuote(s, quote);
-
-            if (!s) {
-                fprintf(stderr, "syntax error\n");
-                return -1;
-            }
-
-            s = rightShift(++s);
-
-            quote = 0;
-            break;
-        default:
-            /*  a command argument  */
-            if (nargs == 0) /* next command */
-                rval = ncmds+1;
-            cntx->cmds[ncmds].cmdargs[nargs++] = s;
-            cntx->cmds[ncmds].cmdargs[nargs] = (char *) NULL;
-            s = strpbrk(s, delim);
-            if (isspace(*s))
-                *s++ = '\0';
-            break;
-        }  /*  close switch  */
-    }  /* close while  */
 
     /*  error check  */
 
@@ -129,37 +55,4 @@ int parseline(Context *cntx, char *line)
     cntx->ncmds = rval;
 
     return(rval);
-}
-
-char *rightShift(char *str) {
-    char *s = str;
-    while (*s) {
-        s++;
-    }
-    *(s + 1) = '\0';
-    while (s != str) {
-        *s = *(s - 1);
-        s--;
-    }
-
-    *s = '\0';
-    return s + 1;
-}
-
-char *findQuote(char *str, char quote) {
-    /* Ищет quote в str. Если не находит, возвращает NULL */
-    char *s = str;
-    while (*s) {
-        if ((str != s) && (quote == *s) && ('\\' != *(s-1))) {
-            return s;
-        }
-        s++;
-    }
-    return NULL;
-}
-
-static char *blankskip(register char *s)
-{
-    while (isspace(*s) && *s) ++s;
-    return(s);
 }

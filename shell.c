@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
     register int i;
-    char line[2048];      /*  allow large command lines  */
+    char line[LINELEN];      /*  allow large command lines  */
     Context cntx;
     cntx.argv = argv;
     cntx.argc = argc;

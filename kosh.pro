@@ -8,11 +8,13 @@ SOURCES += \
     parseline.c \
     context.c \
     debug.c \
-    promptline.c
+    promptline.c \
+    tokenizer.c
 
 include(deployment.pri)
 qtcAddDeployment()
 
 HEADERS += \
-    shell.h
+    shell.h \
+    tokenizer.h
 

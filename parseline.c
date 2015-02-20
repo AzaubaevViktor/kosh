@@ -9,7 +9,6 @@ static char *blankskip(register char *);
 
 int parseline(Context *cntx, char *line)
 {
-    // TODO: Починить последовательность для |
     int nargs, ncmds;
     register char *s;
     char aflg = 0;

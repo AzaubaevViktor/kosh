@@ -1,14 +1,20 @@
 #include <sys/types.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <wait.h>
+#include <errno.h>
 #include "shell.h"
 
-#define DEBUG
+#define _DEBUG
+
+extern int errno;
 
 int main(int argc, char *argv[]) {
     register int i;
-    char line[LINELEN];      /*  allow large command lines  */
+    int pid;
+    char *error;
+    char line[LINELEN];
     Context cntx;
     cntx.argv = argv;
     cntx.argc = argc;
@@ -25,7 +31,20 @@ int main(int argc, char *argv[]) {
 
         for (i = 0; i < cntx.ncmds; i++) {
 
-            /*  FORK AND EXECUTE  */
+#ifdef DEBUG
+            printf("Run `%s`\n",cntx.cmds[i].cmdargs[0]);
+#endif
+            if ((pid = fork()) > 0) {
+                // Parent
+                int status = 0;
+                int pid_end = wait(&status);
+                printf("PID `%d` was end\n", pid_end);
+            } else {
+                execvp(cntx.cmds[i].cmdargs[0], cntx.cmds[i].cmdargs);
+                perror(error);
+                printf("Error %d: `%s`\n", errno, strerror(errno));
+
+            }
 
         }
 

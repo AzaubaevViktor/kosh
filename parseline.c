@@ -31,8 +31,9 @@ int parseline(Context *cntx, char *line)
 
     tokenizer(&tLine, line);
 
+#ifdef DEBUG
     printTokensLine(&tLine);
-
+#endif
     // Error check
 
     while(empty != curToken.type) {

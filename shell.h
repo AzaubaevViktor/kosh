@@ -1,6 +1,8 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+#include "shellerrors.h"
+
 #define MAXARGS (256)
 #define MAXCMDS (50)
 #define LINELEN (2048)
@@ -28,7 +30,7 @@ int promptline(Context *, char *, int);
 void contextNull(Context *cntx);
 void printContext(Context *cntx);
 
-extern int shellError;
+extern enum ShellErrors shellError;
 
 #endif // SHELL_H
 

@@ -2,7 +2,7 @@
 #include "tokenizer.h"
 
 char *actionSequences[ActionsCount] =
-            {"|",      "&",       "<",    ">>",    ">",     ";",       NULL};
+            {"|",      "&",       "<",    ">>",    ">",     ";"};
 
 void clearTokensLine(TokensLine *tLine) {
     int i = 0;
@@ -16,6 +16,8 @@ void clearTokensLine(TokensLine *tLine) {
 void printTokensLine(TokensLine *tLine) {
     int i = 0;
     static char *typesStr[] = {"∅", "S", "Q", "A"};
+
+    printf("TOKENS:\n");
 
     while (empty != curToken.type) {
         printf("%s", typesStr[curToken.type]);
@@ -82,7 +84,8 @@ int tokenizer(TokensLine *tLine, char *line) {
         curToken.str = s;
 
         s = strpbrk(s, delim);
-        *s++ = '\0';
+        s = rightShift(s);
+
         ntok++;
     }
     return 0;

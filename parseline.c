@@ -5,27 +5,23 @@
 #include "shell.h"
 #include "tokenizer.h"
 
-/* ========================== PARSER ========================== */
+enum ShellErrors shellError;
 
 #define curCmd (cntx->cmds[ncmds])
 #define nextCmd (cntx->cmds[ncmds + 1])
 #define curArg (curCmd.cmdargs[nargs])
 #define nextArg (curCmd.cmdargs[nargs + 1])
 #define newCmd() {curArg = (char *) NULL; nargs = 0; ncmds++;}
+#define curToken (tLine.tokens[tokenCounter])
+#define nextToken (tLine.tokens[tokenCounter + 1])
 
 int parseline(Context *cntx, char *line)
 {
     int nargs, ncmds;
-    register char *s;
-    char isAppendFlg = 0;
-    int rval;
-    register int i;
-    static char delim[] = " \t|&<>;\n";
-    char quote = '\0';
 
     /* initialize  */
-    nargs = ncmds = rval = 0;
-    s = line;
+    nargs = ncmds = 0;
+    int tokenCounter = 0;
 
     contextNull(cntx);
 
@@ -37,22 +33,58 @@ int parseline(Context *cntx, char *line)
 
     printTokensLine(&tLine);
 
+    // Error check
 
-    /*  error check  */
-
-    /*
-          *  The only errors that will be checked for are
-      *  no command on the right side of a pipe
-          *  no command to the left of a pipe is checked above
-      */
-    if (cntx->cmds[ncmds-1].cmdflag & OUTPIP) {
-        if (nargs == 0) {
-            fprintf(stderr, "syntax error\n");
-            return(-1);
+    while(empty != curToken.type) {
+        switch (curToken.type) {
+        case str:
+        case quotedStr:
+            curArg = curToken.str;
+            nargs++;
+            tokenCounter++;
+            break;
+        case action:
+            switch (curToken.action) {
+            case conveyor:
+                curCmd.cmdflag |= OUTPIP;
+                nextCmd.cmdflag |= INPIP;
+                newCmd();
+                tokenCounter++;
+                break;
+            case background:
+                curCmd.cmdflag |= BACKGROUND;
+                newCmd();
+                tokenCounter++;
+                break;
+            case infile:
+                curCmd.infile = nextToken.str;
+                tokenCounter += 2;
+                break;
+            case outfile:
+                curCmd.outfile = nextToken.str;
+                tokenCounter += 2;
+                break;
+            case appfile:
+                curCmd.appfile = nextToken.str;
+                tokenCounter += 2;
+                break;
+            case semicolon:
+                newCmd();
+                tokenCounter++;
+                break;
+            default:
+                shellError = InternalErr;
+                return -1;
+                break;
+            }
+            break;
+        default:
+            shellError = InternalErr;
+            return -1;
+            break;
         }
     }
 
-    cntx->ncmds = rval;
-
-    return(rval);
+    cntx->ncmds = ncmds + 1;
+    return ncmds + 1;
 }

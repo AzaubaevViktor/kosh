@@ -1,8 +1,8 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#define MAXARGS 256
-#define MAXCMDS 50
+#define MAXARGS (256)
+#define MAXCMDS (50)
 
 typedef struct _Command {
     char *cmdargs[MAXARGS];
@@ -10,18 +10,20 @@ typedef struct _Command {
 } Command;
 
 /*  cmdflag's  */
-#define OUTPIP  01
-#define INPIP   02
+#define OUTPIP  (01)
+#define INPIP   (02)
 
 typedef struct _Context {
     Command cmds[MAXCMDS];
     char *infile, *outfile, *appfile;
     char bkgrnd;
+    int ncmds;
 } Context;
 
 int parseline(Context *cntx, char *);
 int promptline(char *, char *, int);
 void contextNull(Context *cntx);
+void printContext(Context *cntx);
 
 #endif // SHELL_H
 

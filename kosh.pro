@@ -7,7 +7,8 @@ SOURCES += \
     shell.c \
     parseline.c \
     promptline.c \
-    context.c
+    context.c \
+    debug.c
 
 include(deployment.pri)
 qtcAddDeployment()

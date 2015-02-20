@@ -3,17 +3,20 @@
 #include <ctype.h>
 #include <string.h>
 #include "shell.h"
+char *rightShift(char *str);
+char *findQuote(char *str, char quote);
 static char *blankskip(register char *);
 
 int parseline(Context *cntx, char *line)
 {
+    // TODO: Починить последовательность для |
     int nargs, ncmds;
     register char *s;
     char aflg = 0;
     int rval;
     register int i;
     static char delim[] = " \t|&<>;\n";
-    NULL;
+    char quote = '\0';
 
     /* initialize  */
     nargs = ncmds = rval = 0;
@@ -78,6 +81,25 @@ int parseline(Context *cntx, char *line)
             ++ncmds;
             nargs = 0;
             break;
+        case '\"':
+            quote = '\"';
+        case '\'':
+            quote = !quote ? '\'' : quote;
+
+            cntx->cmds[ncmds].cmdargs[nargs++] = s;
+            cntx->cmds[ncmds].cmdargs[nargs] = (char *) NULL;
+
+            s = findQuote(s, quote);
+
+            if (!s) {
+                fprintf(stderr, "syntax error\n");
+                return -1;
+            }
+
+            s = rightShift(++s);
+
+            quote = 0;
+            break;
         default:
             /*  a command argument  */
             if (nargs == 0) /* next command */
@@ -105,7 +127,36 @@ int parseline(Context *cntx, char *line)
         }
     }
 
+    cntx->ncmds = rval;
+
     return(rval);
+}
+
+char *rightShift(char *str) {
+    char *s = str;
+    while (*s) {
+        s++;
+    }
+    *(s + 1) = '\0';
+    while (s != str) {
+        *s = *(s - 1);
+        s--;
+    }
+
+    *s = '\0';
+    return s + 1;
+}
+
+char *findQuote(char *str, char quote) {
+    /* Ищет quote в str. Если не находит, возвращает NULL */
+    char *s = str;
+    while (*s) {
+        if ((str != s) && (quote == *s) && ('\\' != *(s-1))) {
+            return s;
+        }
+        s++;
+    }
+    return NULL;
 }
 
 static char *blankskip(register char *s)

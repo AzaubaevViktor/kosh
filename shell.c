@@ -9,14 +9,13 @@
 int main(int argc, char *argv[]) {
     register int i;
     char line[2048];      /*  allow large command lines  */
-    char prompt[200];      /* shell prompt */
     Context cntx;
+    cntx.argv = argv;
+    cntx.argc = argc;
 
     /* PLACE SIGNAL CODE HERE */
 
-    sprintf(prompt,"[%s]\n> ", argv[0]);
-
-    while (promptline(prompt, line, sizeof(line)) > 0) {    /* il eof  */
+    while (promptline(&cntx, line, sizeof(line)) > 0) {    /* il eof  */
         if (parseline(&cntx, line) <= 0)
             continue;   /* read next line */
 

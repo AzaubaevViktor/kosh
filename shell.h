@@ -18,10 +18,12 @@ typedef struct _Context {
     char *infile, *outfile, *appfile;
     char bkgrnd;
     int ncmds;
+    int argc;
+    char **argv;
 } Context;
 
 int parseline(Context *cntx, char *);
-int promptline(char *, char *, int);
+int promptline(Context *, char *, int);
 void contextNull(Context *cntx);
 void printContext(Context *cntx);
 

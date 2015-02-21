@@ -95,16 +95,17 @@ int tokenizer(TokensLine *tLine, char *line) {
 }
 
 char *makeDelim(int withQuote) {
-    int i = 0;
+    int j = 0, i = 0;
     char *delim = calloc(ActionsCount + 10, sizeof(char));
-    delim[0] = ' ';
-    delim[1] = (withQuote) ? '\'' : ' ';
-    delim[2] = (withQuote) ? '\"' : ' ';
-    delim[3] = '$';
-    delim[4] = '\t';
-    delim[5] = '\n';
-    for (i = 0; i < ActionsCount; i++) {
-        delim[6 + i] = actionSequences[i][0];
+    delim[i++] = ' ';
+    delim[i++] = (withQuote) ? '\'' : ' ';
+    delim[i++] = (withQuote) ? '\"' : ' ';
+    delim[i++] = (withQuote) ? ':' : ' ';
+    delim[i++] = '$';
+    delim[i++] = '\t';
+    delim[i++] = '\n';
+    for (j = 0; j < ActionsCount; j++, i++) {
+        delim[i] = actionSequences[j][0];
     }
     return delim;
 }

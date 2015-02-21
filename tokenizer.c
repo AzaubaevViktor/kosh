@@ -1,8 +1,10 @@
-#include "shell.h"
 #include "tokenizer.h"
 
+extern enum ShellErrors _shellError;
+
 char *actionSequences[ActionsCount] =
-            {"|",      "&",       "<",    ">>",    ">",     ";"};
+{"|",      "&",       "<",    ">>",    ">",     ";"};
+char quotes[] = "\'\"";
 
 void clearTokensLine(TokensLine *tLine) {
     int i = 0;
@@ -35,7 +37,10 @@ char *makeDelim();
 char *rightShift(char *);
 char *findQuote(char *);
 char *blankskip(register char *);
+char *argHandler(char *s, char *delim);
 #define curToken (tLine->tokens[ntok])
+#define prevToken (tLine->tokens[ntok - 1])
+#define confirmToken(_type, _data) {curToken.type = (_type); if (str == (_type)) {curToken.str = (_data);} else {curToken.action = (enum Action) (_data);}}
 int tokenizer(TokensLine *tLine, char *line) {
     char *delim = makeDelim();
     char *s = line;
@@ -44,33 +49,21 @@ int tokenizer(TokensLine *tLine, char *line) {
     int i = 0;
 
     while (*s) {
+        for (i = 0; '\n' != line[i]; i++) {
+            printf("%3.d[%1c] ", line[i], line[i]);
+        }
+        printf("\n");
         /* Search first comparing */
         s = blankskip(s);
+
         if (!*s)
             break;
-
-        // Quoted string
-        if (('\'' == *s) || ('"' == *s)) {
-            curToken.type = quotedStr;
-            curToken.str = s + 1;
-            s = findQuote(s);
-
-            if (!s) {
-                shellError = TokenizerError;
-                return -1;
-            }
-
-            *s++ = '\0';
-            ntok++;
-            continue;
-        }
 
         // Action
         for(i = 0; i < ActionsCount; i++) {
             _cmp = strstr(s, actionSequences[i]);
             if (_cmp == s) {
-                curToken.type = action;
-                curToken.action = (enum Action) i;
+                confirmToken(action, i);
                 s += strlen(actionSequences[i]) - 1;
                 *s++ = '\0';
                 break;
@@ -82,15 +75,13 @@ int tokenizer(TokensLine *tLine, char *line) {
             ntok++;
             continue;
         }
+        confirmToken(str, s);
 
-        curToken.type = str;
-        curToken.str = s;
-
-        s = strpbrk(s, delim);
-        s = rightShift(s);
+        s = argHandler(s, delim);
 
         ntok++;
     }
+
     return 0;
 }
 
@@ -104,6 +95,18 @@ char *makeDelim() {
         delim[3 + i] = actionSequences[i][0];
     }
     return delim;
+}
+
+char *leftShift(char *str) {
+    char *s = str;
+
+    while (*s) {
+        *s = *(s + 1);
+        s++;
+    }
+
+    *(s - 1) = '\0';
+    return str;
 }
 
 char *rightShift(char *str) {
@@ -141,4 +144,20 @@ char *blankskip(register char *s)
 {
     while (isspace(*s) && *s) ++s;
     return(s);
+}
+
+char *argHandler(char *s, char *delim) {
+    char *end = strpbrk(s, delim);
+    char *quote_end = NULL;
+    end = rightShift(end) - 1;
+    while (*s) {
+        if (('\'' == *s) || ('\"' == *s)) {
+            quote_end = findQuote(s) - 1;
+            s = leftShift(s);
+            shellError(!s, TokenizerError);
+            s = leftShift(quote_end);
+        }
+        s++;
+    }
+    return end + 1;
 }

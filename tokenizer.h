@@ -8,7 +8,7 @@
 
 #define MAXTOKENS (LINELEN/2)
 
-enum TokenType {empty, str, quotedStr, action};
+enum TokenType {empty, str, action};
 enum Action {conveyor, background, infile, appfile, outfile, semicolon, _end};
 #define ActionsCount ((int) _end)
 

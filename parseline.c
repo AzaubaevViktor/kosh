@@ -39,7 +39,6 @@ int parseline(Context *cntx, char *line)
     while(empty != curToken.type) {
         switch (curToken.type) {
         case str:
-        case quotedStr:
             curArg = curToken.str;
             nargs++;
             tokenCounter++;

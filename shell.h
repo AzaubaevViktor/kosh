@@ -30,7 +30,5 @@ int promptline(Context *, char *, int);
 void contextNull(Context *cntx);
 void printContext(Context *cntx);
 
-extern enum ShellErrors shellError;
-
 #endif // SHELL_H
 

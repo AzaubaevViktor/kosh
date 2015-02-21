@@ -1,14 +1,10 @@
-#include <sys/types.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <wait.h>
-#include <errno.h>
+
 #include "shell.h"
 
 #define _DEBUG
 
 extern int errno;
+extern char **environ;
 
 int main(int argc, char *argv[]) {
     register int i;
@@ -37,9 +33,17 @@ int main(int argc, char *argv[]) {
                 // Parent
                 int status = 0;
                 int pid_end = wait(&status);
+                printf("%d\n", status);
             } else {
-                execvp(cntx.cmds[i].cmdargs[0], cntx.cmds[i].cmdargs);
+                cmdType *cmd = getCmdByName(cntx.cmds[i].cmdargs[0]);
+                printf("!%p!\n", cmd);
+                if (cmd) {
+                    return cmd(cntx.cmds[i].cmdargs[0], cntx.cmds[i].cmdargs, environ);
+                } else {
+                    execvp(cntx.cmds[i].cmdargs[0], cntx.cmds[i].cmdargs);
+                }
                 printf("`%s`: Error %d: `%s`\n", cntx.cmds[i].cmdargs[0], errno, strerror(errno));
+                return -1;
             }
 
         }

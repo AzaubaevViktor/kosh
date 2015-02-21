@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "shell.h"
 
 #define MAXTOKENS (LINELEN/2)

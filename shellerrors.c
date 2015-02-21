@@ -1,5 +1,5 @@
 #include "shellerrors.h"
-char *getError(int err) {
+char *getErrorStr(int err) {
     static char *errMsgs[] = {
         "No error",
         "Internal Error"

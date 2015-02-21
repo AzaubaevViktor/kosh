@@ -1,6 +1,7 @@
 #include "tokenizer.h"
 
 extern enum ShellErrors _shellError;
+extern char **environ;
 
 char *actionSequences[ActionsCount] =
 {"|",      "&",       "<",    ">>",    ">",     ";"};
@@ -33,20 +34,24 @@ void printTokensLine(TokensLine *tLine) {
     printf("\n");
 }
 
-char *makeDelim();
+char *makeDelim(int);
 char *rightShift(char *);
 char *findQuote(char *);
 char *blankskip(register char *);
-char *argHandler(char *s, char *delim);
+void argVariables(char *, char *);
+char *argHandler(char *, char *);
 #define curToken (tLine->tokens[ntok])
 #define prevToken (tLine->tokens[ntok - 1])
 #define confirmToken(_type, _data) {curToken.type = (_type); if (str == (_type)) {curToken.str = (_data);} else {curToken.action = (enum Action) (_data);}}
 int tokenizer(TokensLine *tLine, char *line) {
-    char *delim = makeDelim();
+    char *delim = makeDelim(false);
+    char *delimQuote = makeDelim(true);
     char *s = line;
     char *_cmp = NULL;
     int ntok = 0;
     int i = 0;
+
+    argVariables(s, delimQuote);
 
     while (*s) {
         for (i = 0; '\n' != line[i]; i++) {
@@ -85,14 +90,16 @@ int tokenizer(TokensLine *tLine, char *line) {
     return 0;
 }
 
-char *makeDelim() {
+char *makeDelim(int withQuote) {
     int i = 0;
     char *delim = calloc(ActionsCount + 10, sizeof(char));
     delim[0] = ' ';
-    delim[1] = '\t';
-    delim[2] = '\n';
+    delim[1] = (withQuote) ? '\'' : ' ';
+    delim[2] = (withQuote) ? '\"' : ' ';
+    delim[3] = '\t';
+    delim[4] = '\n';
     for (i = 0; i < ActionsCount; i++) {
-        delim[3 + i] = actionSequences[i][0];
+        delim[5 + i] = actionSequences[i][0];
     }
     return delim;
 }
@@ -146,8 +153,68 @@ char *blankskip(register char *s)
     return(s);
 }
 
+char *endStr(char *s) {
+    while (*s) {
+        s++;
+    }
+    return s;
+}
+
+void argVariables(char *s, char *delimQuote) {
+    char *start = s;
+    char *end = endStr(s);
+    char *varEnd = NULL;
+    char res = ' ';
+
+    while (*s) {
+        if ('$' == *s) {
+            varEnd = strpbrk(s + 1, delimQuote);
+            if (varEnd) {
+                res = *varEnd;
+                *varEnd = '\0';
+            }
+            char *envVal = getenv(s + 1);
+            int delta = strlen(envVal) - (strlen(s));
+            if (varEnd)
+                *varEnd = res;
+
+            int i = 0;
+            for (i = 0; i < delta; i++) {
+                *(rightShift(s) - 1) = ' ';
+                end += 1;
+            }
+            for (i = 0; i < -delta; i++) {
+                leftShift(s);
+                end -= 1;
+            }
+
+            for (i = 0; i < strlen(envVal); i++) {
+                s[i] = envVal[i];
+            }
+
+            s += i;
+        } else {
+            s++;
+        }
+    }
+}
+
+char *findEnd(char *s, char *delim) {
+    while (*s) {
+        if (('\'' == *s) || ('\"' == *s)) {
+            s = findQuote(s) + 1;
+            continue;
+        }
+        if (s == strpbrk(s, delim)) {
+            return s;
+        }
+        s++;
+    }
+    return s;
+}
+
 char *argHandler(char *s, char *delim) {
-    char *end = strpbrk(s, delim);
+    char *end =  findEnd(s, delim);
     char *quote_end = NULL;
     end = rightShift(end) - 1;
     while (*s) {

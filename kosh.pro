@@ -10,7 +10,8 @@ SOURCES += \
     debug.c \
     promptline.c \
     tokenizer.c \
-    shellerrors.c
+    shellerrors.c \
+    mycommand.c
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -18,5 +19,6 @@ qtcAddDeployment()
 HEADERS += \
     shell.h \
     tokenizer.h \
-    shellerrors.h
+    shellerrors.h \
+    mycommand.h
 

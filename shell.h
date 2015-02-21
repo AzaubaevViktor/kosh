@@ -1,7 +1,15 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <wait.h>
+#include <errno.h>
 #include "shellerrors.h"
+#include "mycommand.h"
 
 #define MAXARGS (256)
 #define MAXCMDS (50)
@@ -29,6 +37,8 @@ int parseline(Context *cntx, char *);
 int promptline(Context *, char *, int);
 void contextNull(Context *cntx);
 void printContext(Context *cntx);
+
+
 
 #endif // SHELL_H
 

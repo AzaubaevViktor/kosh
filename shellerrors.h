@@ -10,11 +10,11 @@ enum ShellErrors {
 
 enum ShellErrors _shellError;
 
-char *getError(int err);
+char *getErrorStr(int err);
 
 #define shellErrorRet(test, err) if (test) {_shellError = (err); return -1;}
 #define shellError(test, err) if (test) {_shellError = (err); return 0;}
-#define getShellError() (getError(_shellError))
+#define getShellError() (getErrorStr(_shellError))
 
 #endif // SHELLERRORS_H
 

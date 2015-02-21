@@ -83,7 +83,8 @@ int parseline(Context *cntx, char *line)
             break;
         }
     }
+    ncmds += curCmd.cmdargs[0] ? 1 : 0;
 
-    cntx->ncmds = ncmds + 1;
-    return ncmds + 1;
+    cntx->ncmds = ncmds;
+    return ncmds;
 }

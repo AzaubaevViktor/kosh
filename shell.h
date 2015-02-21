@@ -20,6 +20,10 @@
 #define INPIP   (02)
 #define BACKGROUND (04)
 
+#define isBackground(cmd) (cmd->cmdflag & BACKGROUND)
+#define isInPip(cmd) (cmd->cmdflag & INPIP)
+#define isOutPip(cmd) (cmd->cmdflag & OUTPIP)
+
 typedef struct _Command {
     char *cmdargs[MAXARGS];
     char cmdflag;

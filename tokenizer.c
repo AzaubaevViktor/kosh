@@ -54,10 +54,10 @@ int tokenizer(TokensLine *tLine, char *line) {
     argVariables(s, delimQuote);
 
     while (*s) {
-        for (i = 0; '\n' != line[i]; i++) {
-            printf("%3.d[%1c] ", line[i], line[i]);
-        }
-        printf("\n");
+//        for (i = 0; '\n' != line[i]; i++) {
+//            printf("%3.d[%1c] ", line[i], line[i]);
+//        }
+//        printf("\n");
         /* Search first comparing */
         s = blankskip(s);
 
@@ -83,6 +83,10 @@ int tokenizer(TokensLine *tLine, char *line) {
         confirmToken(str, s);
 
         s = argHandler(s, delim);
+        if (isShellError()) {
+            return -1;
+        }
+
 
         ntok++;
     }
@@ -96,10 +100,11 @@ char *makeDelim(int withQuote) {
     delim[0] = ' ';
     delim[1] = (withQuote) ? '\'' : ' ';
     delim[2] = (withQuote) ? '\"' : ' ';
-    delim[3] = '\t';
-    delim[4] = '\n';
+    delim[3] = '$';
+    delim[4] = '\t';
+    delim[5] = '\n';
     for (i = 0; i < ActionsCount; i++) {
-        delim[5 + i] = actionSequences[i][0];
+        delim[6 + i] = actionSequences[i][0];
     }
     return delim;
 }
@@ -174,6 +179,8 @@ void argVariables(char *s, char *delimQuote) {
                 *varEnd = '\0';
             }
             char *envVal = getenv(s + 1);
+            envVal = envVal ? envVal : "";
+
             int delta = strlen(envVal) - (strlen(s));
             if (varEnd)
                 *varEnd = res;
@@ -221,7 +228,7 @@ char *argHandler(char *s, char *delim) {
         if (('\'' == *s) || ('\"' == *s)) {
             quote_end = findQuote(s) - 1;
             s = leftShift(s);
-            shellError(!s, TokenizerError);
+            shellError(!s, QuotesErr);
             s = leftShift(quote_end);
         }
         s++;

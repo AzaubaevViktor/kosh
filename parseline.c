@@ -5,8 +5,6 @@
 #include "shell.h"
 #include "tokenizer.h"
 
-enum ShellErrors shellError;
-
 #define curCmd (cntx->cmds[ncmds])
 #define nextCmd (cntx->cmds[ncmds + 1])
 #define curArg (curCmd.cmdargs[nargs])
@@ -30,6 +28,9 @@ int parseline(Context *cntx, char *line)
     clearTokensLine(&tLine);
 
     tokenizer(&tLine, line);
+    if (isShellError()) {
+        return -1;
+    }
 
 #ifdef DEBUG
     printTokensLine(&tLine);
@@ -73,14 +74,12 @@ int parseline(Context *cntx, char *line)
                 tokenCounter++;
                 break;
             default:
-                shellError = InternalErr;
-                return -1;
+                shellErrorRet(1, ParserErr);
                 break;
             }
             break;
         default:
-            shellError = InternalErr;
-            return -1;
+            shellErrorRet(1, ParserErr);
             break;
         }
     }

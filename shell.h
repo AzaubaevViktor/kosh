@@ -39,6 +39,5 @@ void contextNull(Context *cntx);
 void printContext(Context *cntx);
 
 
-
 #endif // SHELL_H
 

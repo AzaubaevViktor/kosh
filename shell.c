@@ -1,4 +1,3 @@
-
 #include "shell.h"
 
 #define _DEBUG
@@ -19,6 +18,10 @@ int main(int argc, char *argv[]) {
     while (promptline(&cntx, line, sizeof(line)) > 0) {    /* il eof  */
         if (parseline(&cntx, line) <= 0)
             continue;   /* read next line */
+        if (isShellError()) {
+            printf(getShellError());
+            continue;
+        }
 
 #ifdef DEBUG
         printContext(&cntx);
@@ -33,10 +36,10 @@ int main(int argc, char *argv[]) {
                 // Parent
                 int status = 0;
                 int pid_end = wait(&status);
-                printf("%d\n", status);
+//                printf("%d\n", status);
             } else {
-                cmdType *cmd = getCmdByName(cntx.cmds[i].cmdargs[0]);
-                printf("!%p!\n", cmd);
+                BuiltinCmdType *cmd = getCmdByName(cntx.cmds[i].cmdargs[0]);
+//                printf("!%p!\n", cmd);
                 if (cmd) {
                     return cmd(cntx.cmds[i].cmdargs[0], cntx.cmds[i].cmdargs, environ);
                 } else {

@@ -49,21 +49,23 @@ int tokenizer(TokensLine *tLine, char *line) {
         if (!*s)
             break;
 
+        // Quoted string
         if (('\'' == *s) || ('"' == *s)) {
             curToken.type = quotedStr;
-            curToken.str = s;
+            curToken.str = s + 1;
             s = findQuote(s);
 
             if (!s) {
-                fprintf(stderr, "syntax error\n");
+                shellError = TokenizerError;
                 return -1;
             }
 
-            s = rightShift(++s);
+            *s++ = '\0';
             ntok++;
             continue;
         }
 
+        // Action
         for(i = 0; i < ActionsCount; i++) {
             _cmp = strstr(s, actionSequences[i]);
             if (_cmp == s) {
@@ -75,6 +77,7 @@ int tokenizer(TokensLine *tLine, char *line) {
             }
         }
 
+        // String
         if (empty != curToken.type) {
             ntok++;
             continue;

@@ -2,7 +2,9 @@
 #define SHELLERRORS_H
 enum ShellErrors {
     NoErr,
-    InternalErr
+    InternalErr,
+    TokenizerError,
+    ParserError
 };
 #endif // SHELLERRORS_H
 

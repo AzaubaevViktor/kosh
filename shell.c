@@ -13,7 +13,6 @@ extern int errno;
 int main(int argc, char *argv[]) {
     register int i;
     int pid;
-    char *error;
     char line[LINELEN];
     Context cntx;
     cntx.argv = argv;
@@ -38,12 +37,9 @@ int main(int argc, char *argv[]) {
                 // Parent
                 int status = 0;
                 int pid_end = wait(&status);
-                printf("PID `%d` was end\n", pid_end);
             } else {
                 execvp(cntx.cmds[i].cmdargs[0], cntx.cmds[i].cmdargs);
-                perror(error);
-                printf("Error %d: `%s`\n", errno, strerror(errno));
-
+                printf("`%s`: Error %d: `%s`\n", cntx.cmds[i].cmdargs[0], errno, strerror(errno));
             }
 
         }

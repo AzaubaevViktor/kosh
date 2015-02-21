@@ -11,7 +11,8 @@ SOURCES += \
     promptline.c \
     tokenizer.c \
     shellerrors.c \
-    mycommand.c
+    mycommand.c \
+    run.c
 
 include(deployment.pri)
 qtcAddDeployment()

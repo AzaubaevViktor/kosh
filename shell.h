@@ -37,6 +37,7 @@ int parseline(Context *cntx, char *);
 int promptline(Context *, char *, int);
 void contextNull(Context *cntx);
 void printContext(Context *cntx);
+int run(Context *cntx, int i);
 
 
 #endif // SHELL_H

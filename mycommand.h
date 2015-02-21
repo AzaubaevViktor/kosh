@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-typedef int (*BuiltinCmdType)(char *, char **, char **);
+typedef int (BuiltinCmdType)(char *, char **, char **);
 
 typedef struct _BuiltinCommand {
     char *name;

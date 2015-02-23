@@ -30,14 +30,18 @@ int run(Context *cntx, int i) {
     char *cmdName = cmd->cmdargs[0];
     BuiltinCmdType *builtinCmd = getCmdByName(cmdName);
     int pid = 0, pidBackground = 0;
-    static int fdPrev[2], fdCur[2];
+    static int pipeOld[2] = {-1, -1}, pipeNew[2] = {-1, -1};
     int err = 0;
+    int j = 0;
 
-//    close(fdPrev[0]);
-//    close(fdPrev[1]);
-    fdPrev[0] = fdCur[0];
-    fdPrev[1] = fdCur[1];
-    pipe(fdCur);
+    for (j = 0; j < 2; j++) {
+        if (-1 != pipeOld[j]) {
+            close(pipeOld[j]);
+        }
+        pipeOld[j] = pipeNew[j];
+    }
+    pipe(pipeNew);
+    printf("New pipe created: @ %d<-%d @\n", pipeNew[0], pipeNew[1]);
 
     if ((pid = fork()) > 0) {
         // Parent
@@ -75,13 +79,13 @@ int run(Context *cntx, int i) {
                     exit(EXIT_FAILURE);
                 }
             }
-            if (isOutPip(cmd)) {
-                printf("IN@ %d:%d @\n", fdCur[0], fdCur[1]);
-                dup2(fdCur[1], STDOUT_FILENO);
-            }
             if (isInPip(cmd)) {
-                printf("OUT@ %d:%d @\n", fdPrev[0], fdPrev[1]);
-                dup2(fdPrev[0], STDIN_FILENO);
+                printf("%s: IN@ _%d_<-%d @\n", cmdName, pipeOld[0], pipeOld[1]);
+                dup2(pipeOld[0], STDIN_FILENO);
+            }
+            if (isOutPip(cmd)) {
+                printf("%s: OUT@ %d<-_%d_ @\n", cmdName, pipeNew[0], pipeNew[1]);
+                dup2(pipeNew[1], STDOUT_FILENO);
             }
 
             if (builtinCmd) {

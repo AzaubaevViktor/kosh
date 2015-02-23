@@ -6,7 +6,7 @@
 
 void promptMake(Context *cntx, char* prompt) {
     time_t current = time(NULL);
-    sprintf(prompt, "[%s] %s>", cntx->argv[0], ctime(&current));
+    sprintf(prompt, "[%s] {%d} %s>", cntx->argv[0], getpid(), ctime(&current));
 }
 
 

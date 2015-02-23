@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <wait.h>
 #include <errno.h>
+#include <fcntl.h>
 #include "shellerrors.h"
 #include "mycommand.h"
 

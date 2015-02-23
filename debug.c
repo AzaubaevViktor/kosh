@@ -6,19 +6,19 @@
 void printCommand(Command *cmd) {
     int i = 0;
 
-    printf("CMD:\n");
-    printTest(" In : '%s'\n", cmd->infile);
-    printTest(" Out: '%s'\n", cmd->outfile);
-    printTest(" App: '%s'\n", cmd->appfile);
+    printf("+CMD:\n");
+    printTest("| In : '%s'\n", cmd->infile);
+    printTest("| Out: '%s'\n", cmd->outfile);
+    printTest("| App: '%s'\n", cmd->appfile);
 
-    printf(" [");
+    printf("| [");
     for(i = 0; (cmd->cmdargs[i]) && (i < MAXARGS); i++) {
         if (i != 0) {
             printf(", ");
         }
         printf("'%s'", cmd->cmdargs[i]);
     }
-    printf("] FLAGS:(%s, %s, %s)",
+    printf("] FLAGS:(%s, %s, %s)\n",
            isInPip(cmd) ? "IN " : "---",
            isOutPip(cmd) ? "OUT" : "---",
            isBackground(cmd) ? "BGR" : "---");
@@ -28,10 +28,10 @@ void printCommand(Command *cmd) {
 void printContext(Context *cntx) {
     int i = 0;
 
-    printf("COMMANDS:\n[");
+    printf("COMMANDS:\n");
     for (i = 0; i < cntx->ncmds; i++) {
         printCommand(&cntx->cmds[i]);
-        printf("\n");
+        printf("=================================\n");
     }
 
 }

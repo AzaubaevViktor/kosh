@@ -14,13 +14,24 @@ char *pipGetInt() {
     return tempName;
 }
 
+int redirection(char *filename, int flags, int to) {
+    int fileDesc = open(filename, flags);
+    if (-1 == fileDesc) {
+        printf("%s\n", getErrorStr(FileOpenError));
+    }
+    shellErrorRet(-1 == fileDesc, FileOpenError);
+    dup2(fileDesc, to);
+    close(fileDesc);
+    return 0;
+}
+
 int run(Context *cntx, int i) {
     Command *cmd = &(cntx->cmds[i]);
     char *cmdName = cmd->cmdargs[0];
     BuiltinCmdType *builtinCmd = getCmdByName(cmdName);
     int pid = 0, pidBackground = 0;
     static int fdPrev[2], fdCur[2];
-    int fileDesc;
+    int err = 0;
 
 //    close(fdPrev[0]);
 //    close(fdPrev[1]);
@@ -50,22 +61,19 @@ int run(Context *cntx, int i) {
             //            printf("CHILD pid1: %d, pidBackgr: %d\n", pid, pidBackground);
 
             if (cmd->infile) {
-                fileDesc = fileno(fopen(cmd->infile, "r"));
-                shellErrorRet(errno, FileOpenError);
-                dup2(fileDesc, STDIN_FILENO);
-                close(fileDesc);
+                if ((err = redirection(cmd->infile, O_RDONLY, STDIN_FILENO)) != 0) {
+                    exit(EXIT_FAILURE);
+                }
             }
             if (cmd->outfile) {
-                fileDesc = fileno(fopen(cmd->outfile, "w"));
-                shellErrorRet(errno, FileOpenError);
-                dup2(fileDesc, STDOUT_FILENO);
-                close(fileDesc);
+                if ((err = redirection(cmd->outfile, O_WRONLY, STDOUT_FILENO)) != 0) {
+                    exit(EXIT_FAILURE);
+                }
             }
             if (cmd->appfile) {
-                fileDesc = fileno(fopen(cmd->appfile, "a"));
-                shellErrorRet(errno, FileOpenError);
-                dup2(fileDesc, STDOUT_FILENO);
-                close(fileDesc);
+                if ((err = redirection(cmd->appfile, O_WRONLY | O_APPEND, STDOUT_FILENO)) != 0) {
+                    exit(EXIT_FAILURE);
+                }
             }
             if (isOutPip(cmd)) {
                 printf("IN@ %d:%d @\n", fdCur[0], fdCur[1]);

@@ -1,6 +1,6 @@
 #include "shell.h"
 
-#define _DEBUG
+#define DEBUG
 
 extern int errno;
 
@@ -31,6 +31,10 @@ int main(int argc, char *argv[]) {
             printf("Run `%s`\n",cntx.cmds[i].cmdargs[0]);
 #endif
             run(&cntx, i);
+            if (isShellError()) {
+                printf(getShellError());
+                continue;
+            }
         }
 
     }  /* close while */

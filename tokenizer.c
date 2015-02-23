@@ -87,7 +87,6 @@ int tokenizer(TokensLine *tLine, char *line) {
             return -1;
         }
 
-
         ntok++;
     }
 

@@ -19,9 +19,9 @@ void printCommand(Command *cmd) {
         printf("'%s'", cmd->cmdargs[i]);
     }
     printf("] FLAGS:(%s, %s, %s)",
-           cmd->cmdflag & INPIP ? "IN " : "---",
-           cmd->cmdflag & OUTPIP ? "OUT" : "---",
-           cmd->cmdflag & BACKGROUND ? "BGR" : "---");
+           isInPip(cmd) ? "IN " : "---",
+           isOutPip(cmd) ? "OUT" : "---",
+           isBackground(cmd) ? "BGR" : "---");
 
 }
 

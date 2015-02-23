@@ -42,7 +42,8 @@ int set(char *name, char **args, char **environ) {
 BuiltinCommand
 builtinCommands[] = {
     {"help", help},
-    {"set", set}
+    {"set", set},
+    {NULL, NULL}
 };
 
 BuiltinCmdType *getCmdByName(char *name) {

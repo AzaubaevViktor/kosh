@@ -7,7 +7,8 @@ enum ShellErrors {
     ParserErr,
     QuotesErr,
     TokenizerErr,
-    ParserError
+    ParserError,
+    FileOpenError
 };
 
 enum ShellErrors _shellError;

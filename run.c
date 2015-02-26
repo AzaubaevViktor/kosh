@@ -1,6 +1,7 @@
 #include "shell.h"
 
 extern char **environ;
+extern volatile sig_atomic_t isChild;
 
 char *pipGetInt() {
     static char tempName[] = "/tmp/koshXXXXXXXXXXX";
@@ -61,6 +62,8 @@ int run(Context *cntx, int i) {
             printf("Job \"%s\" `%d` has ended\n", cmdName, pidBackground);
             exit(0);
         } else {
+            isChild = true;
+            mySignalSet();
             // Not background or pidBack = 0
             //            printf("CHILD pid1: %d, pidBackgr: %d\n", pid, pidBackground);
 

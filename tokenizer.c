@@ -15,25 +15,6 @@ void clearTokensLine(TokensLine *tLine) {
     }
 }
 
-#define curToken (tLine->tokens[i])
-void printTokensLine(TokensLine *tLine) {
-    int i = 0;
-    static char *typesStr[] = {"∅", "S", "Q", "A"};
-
-    printf("TOKENS:\n");
-
-    while (empty != curToken.type) {
-        printf("%s", typesStr[curToken.type]);
-        if (action == curToken.type)
-            printf("[%d]", curToken.action);
-        else
-            printf("[%s]", curToken.str);
-        printf(" ");
-        i++;
-    }
-    printf("\n");
-}
-
 char *makeDelim(int);
 char *rightShift(char *);
 char *findQuote(char *);
@@ -42,7 +23,11 @@ void argVariables(char *, char *);
 char *argHandler(char *, char *);
 #define curToken (tLine->tokens[ntok])
 #define prevToken (tLine->tokens[ntok - 1])
-#define confirmToken(_type, _data) {curToken.type = (_type); if (str == (_type)) {curToken.str = (_data);} else {curToken.action = (enum Action) (_data);}}
+#define confirmToken(_type, _data) {\
+    curToken.type = (_type);\
+    if (str == (_type)) {curToken.str = (_data);}\
+    else {curToken.action = (enum Action) (_data);}\
+    }
 int tokenizer(TokensLine *tLine, char *line) {
     char *delim = makeDelim(false);
     char *delimQuote = makeDelim(true);
@@ -52,12 +37,15 @@ int tokenizer(TokensLine *tLine, char *line) {
     int i = 0;
 
     argVariables(s, delimQuote);
+#ifdef D_TOKENS
+    printf("%s \n", D_TOKENS);
+#endif
 
     while (*s) {
-//        for (i = 0; '\n' != line[i]; i++) {
-//            printf("%3.d[%1c] ", line[i], line[i]);
-//        }
-//        printf("\n");
+#ifdef D_TOKENS
+        printStrLine(line);
+        printf("\n");
+#endif
         /* Search first comparing */
         s = blankskip(s);
 
@@ -166,7 +154,6 @@ char *endStr(char *s) {
 }
 
 void argVariables(char *s, char *delimQuote) {
-    char *start = s;
     char *end = endStr(s);
     char *varEnd = NULL;
     char res = ' ';
@@ -181,11 +168,11 @@ void argVariables(char *s, char *delimQuote) {
             char *envVal = getenv(s + 1);
             envVal = envVal ? envVal : "";
 
-            int delta = strlen(envVal) - (strlen(s));
+            unsigned int delta = strlen(envVal) - (strlen(s));
             if (varEnd)
                 *varEnd = res;
 
-            int i = 0;
+            unsigned int i = 0;
             for (i = 0; i < delta; i++) {
                 *(rightShift(s) - 1) = ' ';
                 end += 1;

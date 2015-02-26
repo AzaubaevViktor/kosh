@@ -11,8 +11,9 @@ SOURCES += \
     promptline.c \
     tokenizer.c \
     shellerrors.c \
-    mycommand.c \
-    run.c
+    run.c \
+    mysignals.c \
+    builtin.c
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -21,5 +22,8 @@ HEADERS += \
     shell.h \
     tokenizer.h \
     shellerrors.h \
-    mycommand.h
+    builtin.h
+
+DISTFILES += \
+    TODO.md
 

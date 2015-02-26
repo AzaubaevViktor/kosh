@@ -10,12 +10,17 @@
 #include <wait.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include "shellerrors.h"
-#include "mycommand.h"
+#include "builtin.h"
 
 #define MAXARGS (256)
 #define MAXCMDS (50)
 #define LINELEN (2048)
+
+/* strings */
+#define ERROR_FORMAT "`%s`: error #%d '%s'\n"
+// cmdName, errno, strerror(errno)
 
 /*  cmdflag's  */
 #define OUTPIP  (01)
@@ -25,6 +30,30 @@
 #define isBackground(cmd) (cmd->cmdflag & BACKGROUND)
 #define isInPip(cmd) (cmd->cmdflag & INPIP)
 #define isOutPip(cmd) (cmd->cmdflag & OUTPIP)
+
+/* debugs */
+
+#define DEBUG_OFF
+
+#define D_MAIN " !Main:"
+#define D_COMMANDS " !Commands:"
+#define D_SIGNALS " !Signals:"
+#define D_BUILTIN " !Builtin:"
+#define D_PARSER " !Parser:"
+#define D_RUN " !Run:"
+#define D_PIPE " !Pipe:"
+#define D_TOKENS " !Tokens:"
+
+
+#ifdef DEBUG_OFF
+#undef D_MAIN
+#undef D_SIGNALS
+#undef D_BUILTIN
+#undef D_PARSER
+#undef D_RUN
+#undef D_TOKENS
+#endif
+
 
 typedef struct _Command {
     char *cmdargs[MAXARGS];
@@ -39,12 +68,20 @@ typedef struct _Context {
     char **argv;
 } Context;
 
-int parseline(Context *cntx, char *);
-int promptline(Context *, char *, int);
-void contextNull(Context *cntx);
+/* Debug */
+#ifdef D_TOKENS
+void printStrLine(char *line);
+#endif
+#ifdef D_COMMANDS
 void printContext(Context *cntx);
-int run(Context *cntx, int i);
+void printCommand(Command *cmd);
+#endif
 
+int parseline(Context *, char *);
+int promptline(Context *, char *, int);
+void contextNull(Context *);
+int run(Context *, int);
+void mySignalSet(void);
 
 #endif // SHELL_H
 

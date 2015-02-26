@@ -32,8 +32,10 @@ int parseline(Context *cntx, char *line)
         return -1;
     }
 
-#ifdef DEBUG
+#ifdef D_PARSER
+    printf("%s\n", D_PARSER);
     printTokensLine(&tLine);
+    printf("\n");
 #endif
     // Error check
 

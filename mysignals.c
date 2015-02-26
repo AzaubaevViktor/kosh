@@ -11,16 +11,9 @@ void intHandler(int i)
 }
 
 void mySignalSet() {
-    sigset_t newset;
-
-#ifdef DEBUG_SIGNALS
-    printf("%s Start set signal for `%d`", DEBUG_SIGNALS, getpid());
-
+#ifdef D_SIGNALS
+    printf("%s Set signal for `%d`\n", D_SIGNALS, getpid());
 #endif
-
-    sigemptyset(&newset);
-    sigaddset(&newset, SIGHUP);
-    sigprocmask(SIG_BLOCK, &newset, 0);
 
     signal(SIGINT, intHandler);
 }

@@ -1,5 +1,5 @@
-#ifndef MYCOMMAND_H
-#define MYCOMMAND_H
+#ifndef BUILTIN_H
+#define BUILTIN_H
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

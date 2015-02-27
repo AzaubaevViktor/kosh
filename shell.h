@@ -47,10 +47,12 @@
 
 #ifdef DEBUG_OFF
 #undef D_MAIN
+#undef D_COMMANDS
 #undef D_SIGNALS
 #undef D_BUILTIN
 #undef D_PARSER
 #undef D_RUN
+#undef D_PIPE
 #undef D_TOKENS
 #endif
 

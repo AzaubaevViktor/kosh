@@ -99,7 +99,7 @@ int run(Context *cntx, int i) {
             }
             if (cmd->outfile) {
                 if ((err = redirection(cmd->outfile,
-                                       O_WRONLY,
+                                       O_WRONLY | O_CREAT | O_TRUNC,
                                        STDOUT_FILENO)) != 0) {
                     exit(EXIT_FAILURE);
                 }

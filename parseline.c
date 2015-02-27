@@ -24,9 +24,6 @@ int parseline(Context *cntx, char *line)
     contextNull(cntx);
 
     TokensLine tLine;
-
-    clearTokensLine(&tLine);
-
     tokenizer(&tLine, line);
     if (isShellError()) {
         return -1;
@@ -73,6 +70,10 @@ int parseline(Context *cntx, char *line)
                 break;
             case semicolon:
                 newCmd();
+                tokenCounter++;
+                break;
+            case start:
+            case end:
                 tokenCounter++;
                 break;
             default:

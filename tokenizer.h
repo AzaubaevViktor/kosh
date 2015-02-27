@@ -10,7 +10,7 @@
 #define MAXTOKENS (LINELEN/2)
 
 enum TokenType {empty, str, action};
-enum Action {conveyor, background, infile, appfile, outfile, semicolon, _end};
+enum Action {conveyor, background, infile, appfile, outfile, semicolon, start, end, _end};
 #define ActionsCount ((int) _end)
 
 typedef struct _Token {

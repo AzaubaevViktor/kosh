@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
     while (promptline(&cntx, line, sizeof(line)) > 0) {    /* il eof  */
         if (parseline(&cntx, line) <= 0)
             continue;   /* read next line */
+
         if (isShellError()) {
             printf("%s\n", getShellError());
             continue;

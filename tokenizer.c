@@ -4,7 +4,7 @@ extern enum ShellErrors _shellError;
 extern char **environ;
 
 char *actionSequences[ActionsCount] =
-{"|",      "&",       "<",    ">>",    ">",     ";"};
+{"|",      "&",       "<",    ">>",    ">",     ";", " ", " "};
 char quotes[] = "\'\"";
 
 void clearTokensLine(TokensLine *tLine) {
@@ -13,6 +13,16 @@ void clearTokensLine(TokensLine *tLine) {
         tLine->tokens[i].type = empty;
         tLine->tokens[i].str = (char *) NULL;
     }
+}
+
+bool in(char c, char *s) {
+    while (*s) {
+        if (c == *s) {
+            return true;
+        }
+        s++;
+    }
+    return 0;
 }
 
 char *makeDelim(int);
@@ -36,10 +46,15 @@ int tokenizer(TokensLine *tLine, char *line) {
     int ntok = 0;
     int i = 0;
 
+    clearTokensLine(tLine);
+
     argVariables(s, delimQuote);
 #ifdef D_TOKENS
     printf("%s \n", D_TOKENS);
 #endif
+
+    confirmToken(action, start);
+    ntok++;
 
     while (*s) {
 #ifdef D_TOKENS
@@ -77,6 +92,9 @@ int tokenizer(TokensLine *tLine, char *line) {
 
         ntok++;
     }
+
+    confirmToken(action, end);
+    ntok++;
 
     return 0;
 }

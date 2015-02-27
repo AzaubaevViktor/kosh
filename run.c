@@ -42,13 +42,13 @@ int run(Context *cntx, int i) {
         pipeOld[j] = pipeNew[j];
     }
 
-    if (isInPip(cmd) || isOutPip(cmd)) {
+//    if (isInPip(cmd) || isOutPip(cmd)) {
         pipe(pipeNew);
 #ifdef D_RUN
         printf("%s New pipe created: @ %d<-%d @\n",
                D_RUN, pipeNew[0], pipeNew[1]);
 #endif
-    }
+//    }
 
     if ((pid = fork()) > 0) {
         // Parent

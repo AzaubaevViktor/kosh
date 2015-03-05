@@ -13,12 +13,19 @@ void promptMake(Context *cntx, char* prompt) {
 int promptline(Context *cntx, char *line, int sizline) {
     int n = 0;
     static char prompt[1024];
+    int ch;
 
     promptMake(cntx, prompt);
 
     write(1, prompt, strlen(prompt));
     while (1) {
-        n += read(0, (line + n), sizline - n);
+        while (ch = getchar()) {
+            if ((ch == '\n') || (-1 == ch)) {
+                break;
+            }
+            *(line + n) = (char) ch;
+            n++;
+        }
         *(line+n) = '\0';
 
         if (*(line+n-2) == '\\' && *(line+n-1) == '\n') {

@@ -33,7 +33,7 @@
 
 /* debugs */
 
-#define _DEBUG_OFF
+#define DEBUG_OFF
 
 #define D_MAIN " !Main:"
 #define _D_COMMANDS " !Commands:"

@@ -25,5 +25,6 @@ HEADERS += \
     builtin.h
 
 DISTFILES += \
-    TODO.md
+    TODO.md \
+    test.ksh
 

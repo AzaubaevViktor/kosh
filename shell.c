@@ -11,6 +11,12 @@ int main(int argc, char *argv[]) {
     cntx.argv = argv;
     cntx.argc = argc;
 
+    if (2 == argc) {
+        int fd = open(argv[1], O_RDONLY);
+        dup2(fd, STDIN_FILENO);
+        close(fd);
+    }
+
     mySignalSet();
 
     while (promptline(&cntx, line, sizeof(line)) > 0) {    /* il eof  */

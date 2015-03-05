@@ -30,7 +30,7 @@ int run(Context *cntx, int i) {
     Command *cmd = &(cntx->cmds[i]);
     char *cmdName = cmd->cmdargs[0];
     BuiltinCmdType *builtinCmd = getCmdByName(cmdName);
-    int pid = 0, pidBackground = 0;
+    int chPid = 0, pidBackground = 0;
     static int pipeOld[2] = {-1, -1}, pipeNew[2] = {-1, -1};
     int err = 0;
     int j = 0;
@@ -42,30 +42,30 @@ int run(Context *cntx, int i) {
         pipeOld[j] = pipeNew[j];
     }
 
-//    if (isInPip(cmd) || isOutPip(cmd)) {
-        pipe(pipeNew);
+    if (isInPip(cmd) || isOutPip(cmd)) {
+        pipe2(pipeNew, 0);
 #ifdef D_RUN
         printf("%s New pipe created: @ %d<-%d @\n",
                D_RUN, pipeNew[0], pipeNew[1]);
 #endif
-//    }
+    }
 
-    if ((pid = fork()) > 0) {
+    if ((chPid = fork()) > 0) {
         // Parent
         int status = 0;
 #ifdef D_RUN
         printf("%s PARENT: pid1: %d, bckgr:%d\n",
-               D_RUN, pid,  isBackground(cmd));
+               D_RUN, chPid,  isBackground(cmd));
 #endif
         if (!isBackground(cmd)) {
 #ifdef D_RUN
         printf("%s Waiting for status from {%d}\n",
-               D_RUN, pid);
+               D_RUN, chPid);
 #endif
-            waitpid(pid, &status, 0);
+            waitpid(chPid, &status, 0);
 #ifdef D_RUN
         printf("%s PID {%d} closed with status: `%d`\n",
-               D_RUN, pid, status);
+               D_RUN, chPid, status);
 #endif
         }
     } else {
@@ -80,7 +80,7 @@ int run(Context *cntx, int i) {
             int status = 0;
 #ifdef D_RUN
             printf("%s WATCHER: pid1: %d, pidBackgr: %d\n",
-                   D_RUN, pid, pidBackground);
+                   D_RUN, chPid, pidBackground);
 #endif
             printf("Job `%d` started\n", pidBackground);
             waitpid(pidBackground, &status, 0);
@@ -95,7 +95,7 @@ int run(Context *cntx, int i) {
 
 #ifdef D_RUN
             printf("%s CHILD pid1: %d, pidBackgr: %d\n",
-                   D_RUN, pid, pidBackground);
+                   D_RUN, chPid, pidBackground);
 #endif
 
             if (cmd->infile) {

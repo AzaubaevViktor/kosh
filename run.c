@@ -35,6 +35,8 @@ int run(Context *cntx, int i) {
     int err = 0;
     int j = 0;
 
+    // TODO: странное поведение при вызове background -> normal
+
     for (j = 0; j < 2; j++) {
         if (-1 != pipeOld[j]) {
             close(pipeOld[j]);
@@ -54,11 +56,19 @@ int run(Context *cntx, int i) {
         // Parent
         int status = 0;
 #ifdef D_RUN
-        printf("%s PARENT: pid1: %d, pidBackgr: %d; bckgr:%d\n",
-               D_RUN, pid, pidBackground, isBackground(cmd));
+        printf("%s PARENT: pid1: %d, bckgr:%d\n",
+               D_RUN, pid,  isBackground(cmd));
 #endif
         if (!isBackground(cmd)) {
+#ifdef D_RUN
+        printf("%s Waiting for status from {%d}\n",
+               D_RUN, pid);
+#endif
             wait(&status);
+#ifdef D_RUN
+        printf("%s Status from {%d}: `%d`\n",
+               D_RUN, pid, status);
+#endif
         }
     } else {
         // Child

@@ -35,8 +35,6 @@ int run(Context *cntx, int i) {
     int err = 0;
     int j = 0;
 
-    // TODO: странное поведение при вызове background -> normal
-
     for (j = 0; j < 2; j++) {
         if (-1 != pipeOld[j]) {
             close(pipeOld[j]);
@@ -64,7 +62,7 @@ int run(Context *cntx, int i) {
         printf("%s Waiting for status from {%d}\n",
                D_RUN, pid);
 #endif
-            wait(&status);
+            waitpid(pid, &status, 0);
 #ifdef D_RUN
         printf("%s Status from {%d}: `%d`\n",
                D_RUN, pid, status);
@@ -85,7 +83,7 @@ int run(Context *cntx, int i) {
                    D_RUN, pid, pidBackground);
 #endif
             printf("Job `%d` started\n", pidBackground);
-            wait(&status);
+            waitpid(pidBackground, &status, 0);
             printf("Job \"%s\" `%d` has ended\n",
                    cmdName, pidBackground);
             exit(0);

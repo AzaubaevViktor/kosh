@@ -36,13 +36,13 @@
 #define _DEBUG_OFF
 
 #define D_MAIN " !Main:"
-#define D_COMMANDS " !Commands:"
+#define _D_COMMANDS " !Commands:"
 #define D_SIGNALS " !Signals:"
-#define D_BUILTIN " !Builtin:"
-#define D_PARSER " !Parser:"
+#define _D_BUILTIN " !Builtin:"
+#define _D_PARSER " !Parser:"
 #define D_RUN " !Run:"
 #define D_PIPE " !Pipe:"
-#define D_TOKENS " !Tokens:"
+#define _D_TOKENS " !Tokens:"
 
 
 #ifdef DEBUG_OFF

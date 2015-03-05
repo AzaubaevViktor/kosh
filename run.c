@@ -64,14 +64,14 @@ int run(Context *cntx, int i) {
 #endif
             waitpid(pid, &status, 0);
 #ifdef D_RUN
-        printf("%s Status from {%d}: `%d`\n",
+        printf("%s PID {%d} closed with status: `%d`\n",
                D_RUN, pid, status);
 #endif
         }
     } else {
         // Child
 #ifdef D_RUN
-        printf("%s Child forked. PID:{%d} PPID:{%d}\n",
+        printf("%s CHILD forked. PID:{%d} PPID:{%d}\n",
                D_RUN, getpid(), getppid());
 #endif
         if (isBackground(cmd) && ((pidBackground = fork()) > 0)) {
@@ -121,23 +121,27 @@ int run(Context *cntx, int i) {
             }
             if (isInPip(cmd)) {
 #ifdef D_PIPE
-                printf("%s %s: IN@ _%d_<-%d @\n",
+                printf("%s for `%s`: IN@ _%d_<-%d @\n",
                        D_PIPE, cmdName, pipeOld[0], pipeOld[1]);
 #endif
+                close(pipeOld[1]);
                 dup2(pipeOld[0], STDIN_FILENO);
+                close(pipeOld[0]);
             }
             if (isOutPip(cmd)) {
 #ifdef D_PIPE
-                printf("%s %s: OUT@ %d<-_%d_ @\n",
+                printf("%s for `%s`: OUT@ %d<-_%d_ @\n",
                        D_PIPE, cmdName, pipeNew[0], pipeNew[1]);
 #endif
+                close(pipeNew[0]);
                 dup2(pipeNew[1], STDOUT_FILENO);
+                close(pipeNew[1]);
             }
 
             if (builtinCmd) {
                 builtinCmd(cmdName, cmd->cmdargs, environ);
             } else {
-                execvp(cmdName, cmd->cmdargs);
+                execvpe(cmdName, cmd->cmdargs, environ);
             }
             // TODO: Перенаправить вывод обратно в stdin
             printf(ERROR_FORMAT, cmdName, errno, strerror(errno));

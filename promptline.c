@@ -10,14 +10,16 @@ void promptMake(Context *cntx, char* prompt) {
 }
 
 
-int promptline(Context *cntx, char *line, int sizline) {
+int promptline(Context *cntx, char *line, int fromFile) {
     int n = 0;
     static char prompt[1024];
     int ch;
 
-    promptMake(cntx, prompt);
+    if (!fromFile) {
+        promptMake(cntx, prompt);
+        write(1, prompt, strlen(prompt));
+    }
 
-    write(1, prompt, strlen(prompt));
     while (1) {
         while (ch = getchar()) {
             if ((ch == '\n') || (-1 == ch)) {

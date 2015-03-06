@@ -16,7 +16,7 @@ char *pipGetInt() {
 }
 
 int redirection(char *filename, int flags, int to) {
-    int fileDesc = open(filename, flags);
+    int fileDesc = open(filename, flags, 0644);
     if (-1 == fileDesc) {
         printf("%s\n", getErrorStr(FileOpenError));
     }
@@ -114,7 +114,7 @@ int run(Context *cntx, int i) {
             }
             if (cmd->appfile) {
                 if ((err = redirection(cmd->appfile,
-                                       O_WRONLY | O_APPEND,
+                                       O_WRONLY | O_CREAT | O_APPEND,
                                        STDOUT_FILENO)) != 0) {
                     exit(EXIT_FAILURE);
                 }

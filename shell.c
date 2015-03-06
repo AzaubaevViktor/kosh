@@ -4,22 +4,30 @@ extern int errno;
 
 volatile sig_atomic_t isChild = false;
 
+// TODO: Permission denied >>
+// Конвейер + pipe
+// cat < /dev/null WTF
+// Enter-Enter
+
 int main(int argc, char *argv[]) {
     register int i;
     char line[LINELEN];
     Context cntx;
     cntx.argv = argv;
     cntx.argc = argc;
+    int fromFile = false;
 
     if (2 == argc) {
         int fd = open(argv[1], O_RDONLY);
         dup2(fd, STDIN_FILENO);
         close(fd);
+        fromFile = true;
     }
 
     mySignalSet();
 
-    while (promptline(&cntx, line, sizeof(line)) > 0) {    /* il eof  */
+    while (promptline(&cntx, line, fromFile) > 0) {
+        /* il eof  */
         if (parseline(&cntx, line) <= 0)
             continue;   /* read next line */
 

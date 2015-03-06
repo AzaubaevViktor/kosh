@@ -80,7 +80,7 @@ void printCommand(Command *cmd);
 #endif
 
 int parseline(Context *, char *);
-int promptline(Context *, char *, int);
+int promptline(Context *, char *, int fromFile);
 void contextNull(Context *);
 int run(Context *, int);
 void mySignalSet(void);

@@ -9,6 +9,7 @@ void promptMake(Context *cntx, char* prompt) {
     sprintf(prompt, "[%s] {%d} %s>", cntx->argv[0], getpid(), ctime(&current));
 }
 
+#define add_char { *(line + n) = (char) ch; n++; }
 
 int promptline(Context *cntx, char *line, int fromFile) {
     int n = 0;
@@ -23,10 +24,10 @@ int promptline(Context *cntx, char *line, int fromFile) {
     while (1) {
         while (ch = getchar()) {
             if ((ch == '\n') || (-1 == ch)) {
+                add_char;
                 break;
             }
-            *(line + n) = (char) ch;
-            n++;
+            add_char;
         }
         *(line+n) = '\0';
 

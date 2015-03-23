@@ -45,18 +45,21 @@ int biExit(char *name, char **args, char **environ) {
 
 int biFg(char *name, char **args, char **environ) {
     printf("Not realized\n");
+    return 1;
 }
 
 int biBg(char *name, char **args, char **environ) {
     printf("Not realized\n");
+    return 1;
 }
 
 int biJobs(char *name, char **args, char **environ) {
     printf("Not realized\n");
+    return 1;
 }
 
 int biVoid(char *name, char **args, char **environ) {
-    ;
+    return 1;
 }
 
 BuiltinCommand

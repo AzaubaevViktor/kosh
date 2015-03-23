@@ -10,7 +10,12 @@ void intHandler(int i)
     }
 }
 
+void stopHandler(int i) {
+    printf("Stop Signal Catch\n");
+}
+
 void signalInit() {
     debug(D_SIGNALS, "Set signalHandler for {%d}", getpid());
     signal(SIGINT, intHandler);
+    signal(SIGTSTP, stopHandler);
 }

@@ -113,7 +113,7 @@ void printCommand(Command *cmd);
 #endif
 
 int parseline(Context *, char *);
-int promptline(Context *, char *, int fromFile);
+int promptline(Context *, char *, int);
 void contextNull(Context *);
 int run(Context *, int);
 void signalInit(void);

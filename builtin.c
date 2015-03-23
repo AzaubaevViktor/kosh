@@ -3,7 +3,7 @@
 
 extern char **environ;
 
-int help(char *name, char **args, char **envs) {
+int biHelp(char *name, char **args, char **envs) {
     printf("Hello! This is KOrovin SHell.\n");
     printf("My pid:{%d}; my ppid:{%d}\n", getpid(), getppid());
     printf("ARGS:\n");
@@ -21,7 +21,7 @@ int help(char *name, char **args, char **envs) {
     return 0;
 }
 
-int set(char *name, char **args, char **environ) {
+int biSet(char *name, char **args, char **environ) {
     int argc = 0;
     static char *res_s[1024] = {0};
     for (argc = 0; args[argc]; argc++) {}
@@ -39,10 +39,34 @@ int set(char *name, char **args, char **environ) {
     return 0;
 }
 
+int biExit(char *name, char **args, char **environ) {
+    exit(0);
+}
+
+int biFg(char *name, char **args, char **environ) {
+    printf("Not realized\n");
+}
+
+int biBg(char *name, char **args, char **environ) {
+    printf("Not realized\n");
+}
+
+int biJobs(char *name, char **args, char **environ) {
+    printf("Not realized\n");
+}
+
+int biVoid(char *name, char **args, char **environ) {
+    ;
+}
+
 BuiltinCommand
 builtinCommands[] = {
-    {"help", help},
-    {"set", set},
+    {"help", biHelp},
+    {"set", biSet},
+    {"exit", biExit},
+    {"fg", biFg},
+    {"bg", biBg},
+    {"jobs", biJobs},
     {NULL, NULL}
 };
 

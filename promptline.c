@@ -22,7 +22,8 @@ int promptline(Context *cntx, char *line, int fromFile) {
     }
 
     while (1) {
-        while (ch = getchar()) {
+        while (1) {
+            ch = getchar();
             if ((ch == '\n') || (-1 == ch)) {
                 add_char;
                 break;

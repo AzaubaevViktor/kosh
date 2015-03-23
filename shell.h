@@ -6,10 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <wait.h>
 #include <errno.h>
+#define __USE_GNU
 #include <fcntl.h>
+#include <unistd.h>
 #include <signal.h>
 #include "shellerrors.h"
 #include "builtin.h"
@@ -79,14 +80,23 @@
 
 
 #ifdef DEBUG_OFF
+#undef D_MAIN
+#undef D_COMMANDS
+#undef D_SIGNALS
+#undef D_BUILTIN
+#undef D_PARSER
+#undef D_RUN
+#undef D_PIPE
+#undef D_TOKENS
+
 #define D_MAIN     0
 #define D_COMMANDS 0
 #define D_SIGNALS  0
-#define D_BUILTIN 0
-#define D_PARSER  0
+#define D_BUILTIN  0
+#define D_PARSER   0
 #define D_RUN      0
 #define D_PIPE     0
-#define D_TOKENS  0
+#define D_TOKENS   0
 #endif
 
 

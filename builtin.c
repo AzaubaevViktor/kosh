@@ -25,7 +25,6 @@ int set(char *name, char **args, char **environ) {
     int argc = 0;
     static char *res_s[1024] = {0};
     for (argc = 0; args[argc]; argc++) {}
-    printf("СЕЙЧАС ЭТА ПРОГРАММА НЕ РАБОТАЕТ\n");
     if (3 == argc) {
         sprintf((char *) res_s, "%s=%s", args[1], args[2]);
         putenv((char *) res_s);

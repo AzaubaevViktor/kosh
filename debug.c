@@ -3,7 +3,7 @@
 #include "tokenizer.h"
 
 
-#ifdef D_COMMANDS
+#if D_COMMANDS == 1
 #define printTest(format, str) printf((format), (str) ? (str) : "---");
 void printCommand(Command *cmd) {
     int i = 0;
@@ -30,17 +30,18 @@ void printCommand(Command *cmd) {
 #endif
 
 
-#ifdef D_COMMANDS
-void printContext(Context *cntx) {
+#if D_COMMANDS == 1
+int printContext(Context *cntx) {
     int i = 0;
     for (i = 0; i < cntx->ncmds; i++) {
         printCommand(&cntx->cmds[i]);
         printf("  =================================\n");
     }
+    return 0;
 }
 #endif
 
-#ifdef D_TOKENS
+#if D_TOKENS == 1
 void printStrLine(char *line) {
     int i = 0;
     printf("  ");
@@ -51,7 +52,7 @@ void printStrLine(char *line) {
 }
 #endif
 
-#ifdef D_PARSER
+#if D_PARSER == 1
 #define curToken (tLine->tokens[i])
 void printTokensLine(TokensLine *tLine) {
     int i = 0;

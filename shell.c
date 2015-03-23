@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
         fromFile = true;
     }
 
-    signalInit();
+        signalInit();
 
     while (promptline(&cntx, line, fromFile) > 0) {
         /* il eof  */
@@ -34,16 +34,11 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-#ifdef D_COMMANDS
-        printf("%s ", D_COMMANDS);
-        printContext(&cntx);
-#endif
+    debug(D_COMMANDS, "", printContext(&cntx));
 
         for (i = 0; i < cntx.ncmds; i++) {
 
-#ifdef D_MAIN
-            printf("%s Run `%s`\n", D_MAIN, cntx.cmds[i].cmdargs[0]);
-#endif
+    debug(D_MAIN,"Run `%s`", cntx.cmds[i].cmdargs[0]);
             run(&cntx, i);
             if (isShellError()) {
                 printf("%s\n", getShellError());

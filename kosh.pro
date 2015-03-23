@@ -22,7 +22,8 @@ HEADERS += \
     shell.h \
     tokenizer.h \
     shellerrors.h \
-    builtin.h
+    builtin.h \
+    debugutil.h
 
 DISTFILES += \
     TODO.md \

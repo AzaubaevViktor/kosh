@@ -13,6 +13,7 @@
 #include <signal.h>
 #include "shellerrors.h"
 #include "builtin.h"
+#include "debugutil.h"
 
 #define MAXARGS (256)
 #define MAXCMDS (50)
@@ -35,25 +36,57 @@
 
 #define DEBUG_OFF
 
-#define D_MAIN " !Main:"
-#define _D_COMMANDS " !Commands:"
-#define D_SIGNALS " !Signals:"
-#define _D_BUILTIN " !Builtin:"
-#define _D_PARSER " !Parser:"
-#define D_RUN " !Run:"
-#define D_PIPE " !Pipe:"
-#define _D_TOKENS " !Tokens:"
+#define D_MAIN     1
+#define D_COMMANDS 1
+#define D_SIGNALS  1
+#define D_BUILTIN  1
+#define D_PARSER   1
+#define D_RUN      1
+#define D_PIPE     1
+#define D_TOKENS   1
+
+#ifndef D_MAIN
+#define D_MAIN 0
+#endif
+
+#ifndef D_COMMANDS
+#define D_COMMANDS 0
+#endif
+
+#ifndef D_SIGNALS
+#define D_SIGNALS 0
+#endif
+
+#ifndef D_BUILTIN
+#define D_BUILTIN 0
+#endif
+
+#ifndef D_PARSER
+#define D_PARSER 0
+#endif
+
+#ifndef D_RUN
+#define D_RUN 0
+#endif
+
+#ifndef D_PIPE
+#define D_PIPE 0
+#endif
+
+#ifndef D_TOKENS
+#define D_TOKENS 0
+#endif
 
 
 #ifdef DEBUG_OFF
-#undef D_MAIN
-#undef D_COMMANDS
-#undef D_SIGNALS
-#undef D_BUILTIN
-#undef D_PARSER
-#undef D_RUN
-#undef D_PIPE
-#undef D_TOKENS
+#define D_MAIN     0
+#define D_COMMANDS 0
+#define D_SIGNALS  0
+#define D_BUILTIN 0
+#define D_PARSER  0
+#define D_RUN      0
+#define D_PIPE     0
+#define D_TOKENS  0
 #endif
 
 
@@ -75,7 +108,7 @@ typedef struct _Context {
 void printStrLine(char *line);
 #endif
 #ifdef D_COMMANDS
-void printContext(Context *cntx);
+int printContext(Context *cntx);
 void printCommand(Command *cmd);
 #endif
 

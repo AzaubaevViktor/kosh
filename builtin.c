@@ -50,20 +50,13 @@ builtinCommands[] = {
 BuiltinCmdType *getCmdByName(char *name) {
     int i = 0;
     for (i = 0; builtinCommands[i].name; i++) {
-#ifdef D_BUILTIN
-        printf("%s (\"%s\" == \"%s\")? ", D_BUILTIN, builtinCommands[i].name, name);
-#endif
+    debug(D_BUILTIN, "(\"%s\" == \"%s\")? ", builtinCommands[i].name, name);
         if (strcmp(builtinCommands[i].name, name) == 0) {
-#ifdef D_BUILTIN
-            printf("YES\n");
-#endif
+            debugSimple(D_BUILTIN,"YES");
             return builtinCommands[i].cmd;
+        } else {
+            debugSimple(D_BUILTIN,"NO");
         }
-#ifdef D_BUILTIN
-        else {
-            printf("NO\n");
-        }
-#endif
     }
     return NULL;
 }

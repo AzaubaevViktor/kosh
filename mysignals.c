@@ -10,10 +10,7 @@ void intHandler(int i)
     }
 }
 
-void mySignalSet() {
-#ifdef D_SIGNALS
-    printf("%s Set signalHandler for {%d}\n", D_SIGNALS, getpid());
-#endif
-
+void signalInit() {
+    debug(D_SIGNALS, "Set signalHandler for {%d}", getpid());
     signal(SIGINT, intHandler);
 }

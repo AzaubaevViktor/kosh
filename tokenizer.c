@@ -49,15 +49,13 @@ int tokenizer(TokensLine *tLine, char *line) {
     clearTokensLine(tLine);
 
     argVariables(s, delimQuote);
-#ifdef D_TOKENS
-    printf("%s \n", D_TOKENS);
-#endif
+debugSimple(D_TOKENS, "");
 
     confirmToken(action, start);
     ntok++;
 
     while (*s) {
-#ifdef D_TOKENS
+#if D_TOKENS == 1
         printStrLine(line);
         printf("\n");
 #endif

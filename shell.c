@@ -4,10 +4,8 @@ extern int errno;
 
 volatile sig_atomic_t isChild = false;
 
-// TODO: Permission denied >>
 // Конвейер + pipe
-// cat < /dev/null WTF
-// Enter-Enter
+// Маска прав по умолчанию?
 
 int main(int argc, char *argv[]) {
     register int i;
@@ -24,7 +22,7 @@ int main(int argc, char *argv[]) {
         fromFile = true;
     }
 
-    mySignalSet();
+    signalInit();
 
     while (promptline(&cntx, line, fromFile) > 0) {
         /* il eof  */

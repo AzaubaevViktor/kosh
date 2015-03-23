@@ -12,7 +12,7 @@ void intHandler(int i)
 
 void mySignalSet() {
 #ifdef D_SIGNALS
-    printf("%s Set signal for {%d}\n", D_SIGNALS, getpid());
+    printf("%s Set signalHandler for {%d}\n", D_SIGNALS, getpid());
 #endif
 
     signal(SIGINT, intHandler);

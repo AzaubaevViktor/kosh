@@ -83,7 +83,7 @@ int parseline(Context *, char *);
 int promptline(Context *, char *, int fromFile);
 void contextNull(Context *);
 int run(Context *, int);
-void mySignalSet(void);
+void signalInit(void);
 
 #endif // SHELL_H
 

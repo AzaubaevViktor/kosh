@@ -59,13 +59,11 @@ int run(Context *cntx, int i) {
 #endif
         if (!isBackground(cmd)) {
 #ifdef D_RUN
-        printf("%s Waiting for status from {%d}\n",
-               D_RUN, chPid);
+        printf("%s Waiting for status from {%d}\n", D_RUN, chPid);
 #endif
             waitpid(chPid, &status, 0);
 #ifdef D_RUN
-        printf("%s PID {%d} closed with status: `%d`\n",
-               D_RUN, chPid, status);
+        printf("%s PID {%d} closed with status: `%d`\n", D_RUN, chPid, status);
 #endif
         }
     } else {

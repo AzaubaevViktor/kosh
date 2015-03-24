@@ -13,7 +13,8 @@ SOURCES += \
     shellerrors.c \
     run.c \
     mysignals.c \
-    builtin.c
+    builtin.c \
+    jobs.c
 
 include(deployment.pri)
 qtcAddDeployment()

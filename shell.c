@@ -2,7 +2,7 @@
 
 extern int errno;
 
-volatile sig_atomic_t isChild = false;
+extern Context *cntx;
 
 // Конвейер + pipe
 // Маска прав по умолчанию?
@@ -10,9 +10,10 @@ volatile sig_atomic_t isChild = false;
 int main(int argc, char *argv[]) {
     register int i;
     char line[LINELEN];
-    Context cntx;
-    cntx.argv = argv;
-    cntx.argc = argc;
+    Context lCntx;
+    cntx = &lCntx;
+    lCntx.argv = argv;
+    lCntx.argc = argc;
     int fromFile = false;
 
     if (2 == argc) {
@@ -23,10 +24,11 @@ int main(int argc, char *argv[]) {
     }
 
         signalInit();
+        jobsInit(&(lCntx.jobs));
 
-    while (promptline(&cntx, line, fromFile) > 0) {
+    while (promptline(&lCntx, line, fromFile) > 0) {
         /* il eof  */
-        if (parseline(&cntx, line) <= 0)
+        if (parseline(&lCntx, line) <= 0)
             continue;   /* read next line */
 
         if (isShellError()) {
@@ -34,12 +36,12 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-    debug(D_COMMANDS, "", printContext(&cntx));
+    debug(D_COMMANDS, "", printContext(&lCntx));
 
-        for (i = 0; i < cntx.ncmds; i++) {
+        for (i = 0; i < lCntx.ncmds; i++) {
 
-    debug(D_MAIN,"Run `%s`", cntx.cmds[i].cmdargs[0]);
-            run(&cntx, i);
+    debug(D_MAIN,"Run `%s`", lCntx.cmds[i].cmdargs[0]);
+            run(&lCntx, i);
             if (isShellError()) {
                 printf("%s\n", getShellError());
                 continue;

@@ -2,6 +2,7 @@
 #include "builtin.h"
 
 extern char **environ;
+extern Context *cntx;
 
 int biHelp(char *name, char **args, char **envs) {
     printf("Hello! This is KOrovin SHell.\n");
@@ -54,8 +55,28 @@ int biBg(char *name, char **args, char **environ) {
 }
 
 int biJobs(char *name, char **args, char **environ) {
-    printf("Not realized\n");
-    return 1;
+    Jobs *jobs = &cntx->jobs;
+    Job *j = NULL;
+
+    int i = 0;
+
+    if (jobs->jobsCount == 0) {
+        printf("No jobs\n");
+    }
+
+    for (i=0; i < MAX_JOBS; i++) {
+
+        j = &jobs->jobs[i];
+        if (-1 != j->jid) {
+            printf("[%%%d] {%d} [%s|%s]\n",
+                   j->jid,
+                   j->pid,
+                   ISJOBBACKGROUND(j->flags) ? "backgr" : "foregr",
+                   ISJOBSTOPPED(j->flags) ? "stopped" : "running");
+        }
+    }
+
+    return 0;
 }
 
 int biVoid(char *name, char **args, char **environ) {
@@ -76,7 +97,7 @@ builtinCommands[] = {
 BuiltinCmdType *getCmdByName(char *name) {
     int i = 0;
     for (i = 0; builtinCommands[i].name; i++) {
-    debug(D_BUILTIN, "(\"%s\" == \"%s\")? ", builtinCommands[i].name, name);
+        debug(D_BUILTIN, "(\"%s\" == \"%s\")? ", builtinCommands[i].name, name);
         if (strcmp(builtinCommands[i].name, name) == 0) {
             debugSimple(D_BUILTIN,"YES");
             return builtinCommands[i].cmd;

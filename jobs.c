@@ -75,7 +75,7 @@ void updateJobs(Jobs *jobs) {
     pid_t pid = -1;
     Job *j = NULL;
     int flags = 0;
-    debugSimple(D_JOB, "Update job status");
+    debugSimple(D_JOB, "Update jobs status");
     while (-1 != waitid(P_ALL, -1, &sinfo, WNOHANG)) {
         pid = sinfo.si_pid;
         debug(D_JOB, "Job with pid {%d} change status", pid);

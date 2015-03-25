@@ -14,20 +14,26 @@ int main(int argc, char *argv[]) {
     cntx = &lCntx;
     lCntx.argv = argv;
     lCntx.argc = argc;
-    int fromFile = false;
+    lCntx.fromFile = false;
 
     if (2 == argc) {
         int fd = open(argv[1], O_RDONLY);
         dup2(fd, STDIN_FILENO);
         close(fd);
-        fromFile = true;
+        lCntx.fromFile = true;
     }
 
         signalInit();
         jobsInit(&(lCntx.jobs));
 
-    while (promptline(&lCntx, line, fromFile) > 0) {
+    while (1) {
+        promptline(&lCntx, line);
         /* il eof  */
+
+        if (*line == '\0') {
+            continue;
+        }
+
         if (parseline(&lCntx, line) <= 0)
             continue;   /* read next line */
 

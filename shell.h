@@ -144,6 +144,7 @@ Job *newJob(Jobs *jobs, pid_t pid, pid_t pgid, int flags);
 Job *getJobByJid(Jobs *jobs, int jid);
 Job *getJobByPid(Jobs *jobs, int pid);
 void updateJob(Jobs *jobs, Job *j, int flags);
+void updateJobs(Jobs *jobs);
 
 /* Commands */
 
@@ -159,6 +160,7 @@ typedef struct _Context {
     int argc;
     char **argv;
     Jobs jobs;
+    int fromFile;
 } Context;
 
 Context *cntx;
@@ -173,7 +175,8 @@ void printCommand(Command *cmd);
 #endif
 
 int parseline(Context *, char *);
-int promptline(Context *, char *, int);
+void printMake(Context *cntx);
+void promptline(Context *, char *);
 void contextNull(Context *);
 int run(Context *, int);
 void signalInit(void);

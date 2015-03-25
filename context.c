@@ -1,5 +1,4 @@
 #include <shell.h>
-#include <stdio.h>
 
 void contextNull(Context *cntx) {
     int j, i = j = 0;

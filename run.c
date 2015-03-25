@@ -93,6 +93,8 @@ int run(Context *cntx, int i) {
     static int pipeOld[2] = {-1, -1}, pipeNew[2] = {-1, -1};
     int j = 0;
 
+    updateJobs(&(cntx->jobs));
+
     for (j = 0; j < 2; j++) {
         if (-1 != pipeOld[j]) {
             close(pipeOld[j]);
@@ -116,18 +118,18 @@ int run(Context *cntx, int i) {
             debug(D_RUN, "Set foreground group {%d}", chPid);
             tcsetpgrp(0, chPid);
         }
-
     }
 
     // Parent
-    int status = 0;
-    debug(D_RUN,"PARENT: Children PID: {%d}, bckgr:%d",
-          chPid, isBackground(cmd));
-    if (!isBackground(cmd)) {
-        debug(D_RUN, "Waiting for status from {%d}", chPid);
-        waitpid(chPid, &status, 0);
-        debug(D_RUN, "PID {%d} closed with status: `%d`", chPid, status);
-    }
+//    int status = 0;
+//    debug(D_RUN,"PARENT: Children PID: {%d}, bckgr:%d",
+//          chPid, isBackground(cmd));
+//    if (!isBackground(cmd)) {
+//        debug(D_RUN, "Waiting for status from {%d}", chPid);
+//        waitpid(chPid, &status, 0);
+//        // tcsetpgrp called from signal handler
+//        debug(D_RUN, "PID {%d} closed with status: `%d`", chPid, status);
+//    }
 
     return 0;
 }

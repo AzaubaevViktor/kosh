@@ -58,6 +58,8 @@ int biJobs(char *name, char **args, char **environ) {
     Jobs *jobs = &cntx->jobs;
     Job *j = NULL;
 
+    updateJobs(jobs);
+
     int i = 0;
 
     if (jobs->jobsCount == 0) {

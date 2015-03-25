@@ -9,25 +9,26 @@ void promptMake(Context *cntx, char* prompt) {
     sprintf(prompt, "[%s] {%d} %s>", cntx->argv[0], getpid(), ctime(&current));
 }
 
-#define add_char { *(line + n) = (char) ch; n++; }
-
-int promptline(Context *cntx, char *line, int fromFile) {
-    int n = 0;
+void printMake(Context *cntx) {
     static char prompt[1024];
-    int ch;
-
-    if (!fromFile) {
+    if (!cntx->fromFile) {
         promptMake(cntx, prompt);
         write(1, prompt, strlen(prompt));
     }
+}
+
+#define add_char { *(line + n) = (char) ch; n++; }
+
+void promptline(Context *cntx, char *line) {
+    int n = 0;
+    int ch;
+
+    printMake(cntx);
 
     while (1) {
         while (1) {
-            ch = getchar();
-            if (ch == -1) {
-                continue;
-            }
-            if ((ch == '\n') || (-1 == ch)) {
+            while (-1 == (ch = getchar()));
+            if (ch == '\n') {
                 add_char;
                 break;
             }
@@ -43,6 +44,6 @@ int promptline(Context *cntx, char *line, int fromFile) {
             continue;   /*  read next line  */
         }
 
-        return n;      /* all done */
+        return;      /* all done */
     }
 }

@@ -78,6 +78,9 @@ int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
     execvpe(cmdName, cmd->cmdargs, environ);
 
     // TODO: Перенаправить вывод обратно в stdin
+    debug(D_RUN, "Exec error. Set foreground group [%d] (parent)",
+          getpgid(getppid()));
+    tcsetpgrp(0, getpgid(getppid()));
     printf(ERROR_FORMAT, cmdName, errno, strerror(errno));
     exit(EXIT_FAILURE);
 }

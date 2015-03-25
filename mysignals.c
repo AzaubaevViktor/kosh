@@ -17,22 +17,11 @@ void childAction(int i, siginfo_t *sinfo, void *context) {
     pid_t pid = sinfo->si_pid;
     int jobStatus = sinfo->si_status;
 
-    Jobs *jobs = &cntx->jobs;
-    Job *j = getJobByPid(jobs, pid);
-
-    if (!j) {
-        debug(D_JOB, "Job with pid {%d} not found", pid);
-        return;
+    if (WIFEXITED(jobStatus)) {
+        printf("Process with pid {%d} exited\n", pid);
     }
 
-    int flags = j->flags;
-
-    SETJOBFLAG(flags, JOBEND, WIFEXITED(jobStatus));
-    SETJOBFLAG(flags, JOBSTOPPED, WIFSTOPPED(jobStatus));
-
-    updateJob(jobs, j, flags);
-
-    debugSimple(D_RUN, "Set shell to foreground");
+    debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
     tcsetpgrp(0, getpgid(0));
 
     debug(D_JOB, "Job status is `%d`", jobStatus);
@@ -48,8 +37,9 @@ void signalInit() {
     struct sigaction setup_action;
     sigset_t block_mask;
 
+    // For children
+
     sigemptyset (&block_mask);
-    /* Block other terminal-generated signals while handler runs. */
     sigaddset (&block_mask, SIGINT);
     sigaddset (&block_mask, SIGTSTP);
     sigaddset (&block_mask, SIGCHLD);

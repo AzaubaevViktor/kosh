@@ -70,3 +70,30 @@ void updateJob(Jobs *jobs, Job *j, int flags) {
     }
 }
 
+void updateJobs(Jobs *jobs) {
+    siginfo_t sinfo;
+    pid_t pid = -1;
+    Job *j = NULL;
+    int flags = 0;
+    debugSimple(D_JOB, "Update job status");
+    while (-1 != waitid(P_ALL, -1, &sinfo, WNOHANG)) {
+        pid = sinfo.si_pid;
+        debug(D_JOB, "Job with pid {%d} change status", pid);
+        j = getJobByPid(jobs, pid);
+        if (!j) {
+            debug(D_JOB, "Job with pid {%d} not found", pid);
+            return;
+        }
+        flags = j->flags;
+        SETJOBFLAG(flags, JOBEND,
+                   sinfo.si_code == CLD_EXITED || sinfo.si_code == CLD_KILLED);
+        if (sinfo.si_code == CLD_STOPPED) {
+            SETJOBFLAG(flags, JOBSTOPPED, 1);
+        } elif (sinfo.si_code == CLD_CONTINUED) {
+            SETJOBFLAG(flags, JOBSTOPPED, 0);
+        }
+
+        updateJob(jobs, j, flags);
+    }
+}
+

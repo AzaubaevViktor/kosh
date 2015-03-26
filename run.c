@@ -91,7 +91,7 @@ int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
 int run(Context *cntx, int i) {
     Command *cmd = &(cntx->cmds[i]);
     char *cmdName = cmd->cmdargs[0];
-    BuiltinCmdType *builtinCmd = getCmdByName(cmdName);
+    BuiltinCmd *builtinCmd = getCmdByName(cmdName);
     int chPid = 0;
     static int pipeOld[2] = {-1, -1}, pipeNew[2] = {-1, -1};
     int j = 0;

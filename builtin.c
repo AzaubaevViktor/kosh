@@ -1,5 +1,4 @@
 #include "shell.h"
-#include "builtin.h"
 
 extern char **environ;
 extern Context *cntx;
@@ -10,13 +9,13 @@ int biHelp(char *name, char **args, char **envs) {
     printf("ARGS:\n");
     char **curargs = args;
     while (*curargs) {
-        printf(" > %s\n", *curargs);
+        printf(" %s\n", *curargs);
         curargs++;
     }
     printf("ENVIRONMENTS:\n");
     char **curenv = envs;
     while (*curenv) {
-        printf(" > %s\n", *curenv);
+        printf(" %s\n", *curenv);
         curenv++;
     }
     return 0;
@@ -41,6 +40,7 @@ int biSet(char *name, char **args, char **environ) {
 }
 
 int biExit(char *name, char **args, char **environ) {
+    printf("\nBye!\n");
     exit(0);
 }
 
@@ -86,8 +86,10 @@ int biVoid(char *name, char **args, char **environ) {
     return 1;
 }
 
-BuiltinCommand
-builtinCommands[] = {
+static struct {
+    char *name;
+    BuiltinCmd *cmd;
+} builtinCommands[] = {
     {"help", biHelp},
     {"set", biSet},
     {"exit", biExit},
@@ -97,7 +99,7 @@ builtinCommands[] = {
     {NULL, NULL}
 };
 
-BuiltinCmdType *getCmdByName(char *name) {
+BuiltinCmd *getCmdByName(char *name) {
     int i = 0;
     for (i = 0; builtinCommands[i].name; i++) {
         debug(D_BUILTIN, "(\"%s\" == \"%s\")? ", builtinCommands[i].name, name);

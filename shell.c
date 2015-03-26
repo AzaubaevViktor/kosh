@@ -7,7 +7,6 @@ extern int errno;
 extern Context *cntx;
 
 // Конвейер + pipe
-// Маска прав по умолчанию?
 
 int test(void) {
     int flags = 0;
@@ -43,8 +42,6 @@ int main(int argc, char *argv[]) {
     lCntx.argv = argv;
     lCntx.argc = argc;
     lCntx.fromFile = false;
-
-    test();
 
     if (2 == argc) {
         int fd = open(argv[1], O_RDONLY);

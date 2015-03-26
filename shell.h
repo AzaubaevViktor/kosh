@@ -12,8 +12,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdbool.h>
 #include "shellerrors.h"
-#include "builtin.h"
 #include "debugutil.h"
 
 #define elif else if
@@ -164,6 +164,12 @@ typedef struct _Context {
 } Context;
 
 Context *cntx;
+
+/* Builtin commands */
+
+typedef int (BuiltinCmd)(char *, char **, char **);
+
+BuiltinCmd *getCmdByName(char *name);
 
 /* Debug */
 #if 1 == D_TOKENS

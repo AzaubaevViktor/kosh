@@ -1,12 +1,24 @@
 #include <shell.h>
 
-void contextNull(Context *cntx) {
-    int j, i = j = 0;
+void _commandNull(Command *cmd) {
+    int j = 0;
+    cmd->cmdflag = 0;
+    cmd->infile = cmd->outfile = cmd->appfile = (char *) NULL;
+    for (j = 0; j < MAXARGS; j++) {
+        cmd.cmdargs[j] = (char *) NULL;
+    }
+}
+
+void contextInit(Context *cntx, int argc, char **argv) {
+    int i = 0;
+
+    cntx->ncmds = 0;
+    cntx->argc = argc;
+    cntx->argv = argv;
+    cntx->fromFile = false;
+    jobsInit(&(cntx->jobs));
+
     for (i = 0; i < MAXCMDS; i++) {
-        cntx->cmds[i].cmdflag = 0;
-        cntx->cmds[i].infile = cntx->cmds[i].outfile = cntx->cmds[i].appfile = (char *) NULL;
-        for (j = 0; j < MAXARGS; j++) {
-            cntx->cmds[i].cmdargs[j] = (char *) NULL;
-        }
+        _commandNull(&(cntx->cmds[i]));
     }
 }

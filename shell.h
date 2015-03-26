@@ -160,7 +160,7 @@ typedef struct _Context {
     int argc;
     char **argv;
     Jobs jobs;
-    int fromFile;
+    bool fromFile;
 } Context;
 
 Context *cntx;
@@ -183,7 +183,7 @@ void printCommand(Command *cmd);
 int parseline(Context *, char *);
 void printPrompt(Context *cntx);
 void promptline(Context *, char *);
-void contextNull(Context *);
+void contextInit(Context *, int argc, char **argv);
 int run(Context *, int);
 void signalInit(void);
 

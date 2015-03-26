@@ -39,9 +39,8 @@ int main(int argc, char *argv[]) {
     char line[LINELEN];
     Context lCntx;
     cntx = &lCntx;
-    lCntx.argv = argv;
-    lCntx.argc = argc;
-    lCntx.fromFile = false;
+
+    contextInit(&lCntx, argc, argv);
 
     if (2 == argc) {
         int fd = open(argv[1], O_RDONLY);
@@ -51,14 +50,14 @@ int main(int argc, char *argv[]) {
     }
 
     signalInit();
-    jobsInit(&(lCntx.jobs));
 
+    // Костыль
     printPrompt(cntx);
 
     while (1) {
         promptline(&lCntx, line);
-        /* il eof  */
 
+        /* if eof  */
         if (*line == '\0') {
             continue;
         }
@@ -86,5 +85,3 @@ int main(int argc, char *argv[]) {
     }  /* close while */
     return 0;
 }
-
-/* PLACE SIGNAL CODE HERE */

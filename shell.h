@@ -37,14 +37,14 @@
 
 /* debugs */
 
-#define DEBUG_OFF
+#define _DEBUG_OFF
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
 #define D_SIGNALS  1
 #define _D_BUILTIN  1
 #define _D_PARSER   1
-#define D_RUN      1
+#define _D_RUN      1
 #define _D_PIPE     1
 #define _D_TOKENS   1
 #define D_JOB      1
@@ -144,6 +144,7 @@ void addExitedPid(Jobs *jobs, pid_t pid);
 Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags);
 Job *getJobByJid(Jobs *jobs, int jid);
 Job *getJobByPid(Jobs *jobs, int pid);
+void waitForegroundJob(Jobs *jobs, pid_t pid);
 void updateJobs(Jobs *jobs);
 
 /* Commands */

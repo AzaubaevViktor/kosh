@@ -16,8 +16,6 @@ void childDieHandler(int i) {
     debugSimple(D_SIGNALS, "Child change state");
 
     updateJobs(&(cntx->jobs));
-
-
 }
 
 void signalInit() {

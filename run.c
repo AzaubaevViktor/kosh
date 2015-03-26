@@ -110,13 +110,15 @@ int run(Context *cntx, int i) {
 
     if (builtinCmd) {
         builtinCmd(cmdName, cmd->cmdargs, environ);
-        printPrompt(cntx);
     } else {
         chPid = runChild(cntx, i, pipeOld, pipeNew);
         if (isBackground(cmd)) {
             debug(D_RUN, "DONT set foreground group {%d}, because process "
                          "is background", chPid);
         } else {
+            printf("Wait foreground {%d}\n", chPid);
+            waitForegroundJob(&(cntx->jobs), chPid);
+
             debug(D_RUN, "Set foreground group {%d}", chPid);
             tcsetpgrp(0, chPid);
         }

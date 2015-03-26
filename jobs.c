@@ -57,10 +57,11 @@ void _deleteExitedPid(Jobs *jobs, pid_t pid) {
 }
 
 Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags) {
+    printf("New job pid {%d}\n", pid);
     if (_isPidInExitedPid(jobs, pid)) {
         debug(D_JOB, "Job with pid{%d} currently exited.", pid);
         if (ISJOBBACKGROUND(flags)) {
-            printf("Job pid{%d} exited\n", pid);
+            printf("Job [%%%d] with pid{%d} exited\n", jobs->jobsCount + 1, pid);
         }
         _deleteExitedPid(jobs, pid);
         return NULL;
@@ -107,45 +108,86 @@ void _updateJob(Jobs *jobs, Job *j, int flags) {
 
     if (ISJOBEND(flags)) {
         debug(D_JOB, "Job [%d] {%d} exited/killed", j->jid, j->pid);
-        if (j && ISJOBBACKGROUND(j->flags)) {
-            printf("Process with pid {%d} exited\n", j->pid);
-        }
+        _deleteExitedPid(jobs, j->pid);
         _deleteJob(jobs, j);
     }
 }
 
-void updateJobs(Jobs *jobs) {
-    int status;
-    pid_t pid = -1;
-    Job *j = NULL;
-    int flags = 0;
+pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
+    /* when job exited, first call updateJobs in signal handler, or
+     * wait in run->waitPid
+     */
 
-    debugSimple(D_JOB, "Update jobs status");
-    // waitpid returned -1 if error
-    // 0 if children doesn't change status
-    while (0 < (pid = waitpid(-1, &status, WNOHANG | WUNTRACED))) {
-        debug(D_JOB, "Job with pid {%d} change status", pid);
+    printf("Wait {%d}\n", pid);
+
+    int flags = 0;
+    pid_t retPid = -1;
+    int status = 0;
+    Job *j = NULL;
+    bool pidIsExited = false;
+
+    if (-1 != pid) {
+        pidIsExited = _isPidInExitedPid(jobs, pid);
         j = getJobByPid(jobs, pid);
+
         if (!j) {
             debug(D_JOB, "Job with pid {%d} not found", pid);
-            return;
-        }
 
-        flags = j->flags;
-        if (WIFEXITED(status)) {
-            addExitedPid(jobs, pid);
-            debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
-            tcsetpgrp(0, getpgid(0));
-            SETJOBFLAG(flags, JOBEND, 1);
-        } elif (WIFSTOPPED(status)) {
-            SETJOBFLAG(flags, JOBSTOPPED, 1);
-            debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
-            tcsetpgrp(0, getpgid(0));
-        } elif (WIFCONTINUED(status)) {
-            SETJOBFLAG(flags, JOBSTOPPED, 0);
+            if (pidIsExited) {
+                /* this can be only in childDieHandler->updateJobs */
+                // If job not found, mark it as exited and return
+                _deleteExitedPid(jobs, pid);
+                return pid;
+            }
+        } else {
+            flags = j->flags;
+            // pidIsExited not handle, because
+            // addExitedPid may be only after this
         }
+    }
 
+    // if {pid} not exited and Job exist or
+    // if {pid} not exited and Job doesn't exits, wait while they change status
+    // waitpid returned -1 if error
+    // 0 if children doesn't change status
+    retPid = waitpid(pid, &status, options);
+
+    if (retPid <= 0) {
+        return retPid;
+    }
+
+    if (!j) {
+        j = getJobByPid(jobs, retPid);
+        flags = j ? j->flags : 0;
+    }
+
+    debug(D_JOB, "Job with pid {%d} change status", retPid);
+
+    if (WIFEXITED(status)) {
+        addExitedPid(jobs, retPid);
+        debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
+        tcsetpgrp(0, getpgid(0));
+        SETJOBFLAG(flags, JOBEND, 1);
+    } elif (WIFSTOPPED(status)) {
+        SETJOBFLAG(flags, JOBSTOPPED, 1);
+        debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
+        tcsetpgrp(0, getpgid(0));
+    } elif (WIFCONTINUED(status)) {
+        SETJOBFLAG(flags, JOBSTOPPED, 0);
+    }
+
+    if (j) {
         _updateJob(jobs, j, flags);
     }
+    return retPid;
+}
+
+void waitForegroundJob(Jobs *jobs, pid_t pid) {
+    _waitJob(jobs, pid, 0);
+}
+
+void updateJobs(Jobs *jobs) {
+    debugSimple(D_JOB, "Update jobs status");
+    while (0 < (_waitJob(jobs, -1, WNOHANG | WUNTRACED)));
 }
 

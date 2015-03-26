@@ -51,9 +51,8 @@ int main(int argc, char *argv[]) {
 
     signalInit();
 
-    printPrompt(cntx);
-
     while (1) {
+        printPrompt(cntx);
         readCmds(&lCntx, line);
 
         /* if eof  */
@@ -80,6 +79,7 @@ int main(int argc, char *argv[]) {
                 printf("%s\n", getShellError());
                 continue;
             }
+
         }
 
     }  /* close while */

@@ -21,7 +21,7 @@ int parseline(Context *cntx, char *line)
     nargs = ncmds = 0;
     int tokenCounter = 0;
 
-    contextInit(cntx);
+    commandClean(cntx);
 
     TokensLine tLine;
     tokenizer(&tLine, line);

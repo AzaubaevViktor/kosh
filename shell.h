@@ -165,6 +165,9 @@ typedef struct _Context {
 
 Context *cntx;
 
+void contextInit(Context *, int argc, char **argv);
+void contextInit(Context *cntx, int argc, char **argv);
+
 /* Builtin commands */
 
 typedef int (BuiltinCmd)(char *, char **, char **);
@@ -183,7 +186,6 @@ void printCommand(Command *cmd);
 int parseline(Context *, char *);
 void printPrompt(Context *cntx);
 void promptline(Context *, char *);
-void contextInit(Context *, int argc, char **argv);
 int run(Context *, int);
 void signalInit(void);
 

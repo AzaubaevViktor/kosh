@@ -5,20 +5,23 @@ void _commandNull(Command *cmd) {
     cmd->cmdflag = 0;
     cmd->infile = cmd->outfile = cmd->appfile = (char *) NULL;
     for (j = 0; j < MAXARGS; j++) {
-        cmd.cmdargs[j] = (char *) NULL;
+        cmd->cmdargs[j] = (char *) NULL;
+    }
+}
+
+void commandClean(Context *cntx) {
+    int i = 0;
+    for (i = 0; i < MAXCMDS; i++) {
+        _commandNull(&(cntx->cmds[i]));
     }
 }
 
 void contextInit(Context *cntx, int argc, char **argv) {
-    int i = 0;
-
     cntx->ncmds = 0;
     cntx->argc = argc;
     cntx->argv = argv;
     cntx->fromFile = false;
     jobsInit(&(cntx->jobs));
 
-    for (i = 0; i < MAXCMDS; i++) {
-        _commandNull(&(cntx->cmds[i]));
-    }
+    commandClean(cntx);
 }

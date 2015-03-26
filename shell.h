@@ -128,7 +128,7 @@
 typedef struct _Job {
     int jid;
     pid_t pid;
-    char cmdName[200];
+    char cmdName[LINELEN];
     int flags;
 } Job;
 

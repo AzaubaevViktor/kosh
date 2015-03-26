@@ -27,17 +27,17 @@
 // cmdName, errno, strerror(errno)
 
 /*  cmdflag's  */
-#define OUTPIP  (01)
-#define INPIP   (02)
-#define BACKGROUND (04)
+#define OUTPIP  (1)
+#define INPIP   (2)
+#define BACKGROUND (4)
 
-#define isBackground(cmd) (cmd->cmdflag & BACKGROUND)
-#define isInPip(cmd) (cmd->cmdflag & INPIP)
-#define isOutPip(cmd) (cmd->cmdflag & OUTPIP)
+#define isBackground(cmd) (!!(cmd->cmdflag & BACKGROUND))
+#define isInPip(cmd) (!!(cmd->cmdflag & INPIP))
+#define isOutPip(cmd) (!!(cmd->cmdflag & OUTPIP))
 
 /* debugs */
 
-#define _DEBUG_OFF
+#define DEBUG_OFF
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
@@ -128,23 +128,23 @@
 typedef struct _Job {
     int jid;
     pid_t pid;
-    pid_t pgid;
+    char cmdName[200];
     int flags;
 } Job;
 
 typedef struct _Jobs {
     int nextEmpty;
     int jobsCount;
-    pid_t crashesPid[MAX_JOBS];
+    pid_t exitedPid[MAX_JOBS];
     Job jobs[MAX_JOBS];
 } Jobs;
 
 void jobsInit(Jobs *jobs);
-Job *newJob(Jobs *jobs, pid_t pid, pid_t pgid, int flags);
+void addExitedPid(Jobs *jobs, pid_t pid);
+Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags);
 Job *getJobByJid(Jobs *jobs, int jid);
 Job *getJobByPid(Jobs *jobs, int pid);
-void updateJob(Jobs *jobs, Job *j, int flags);
-void updateJobs(Jobs *jobs);
+void updateJobs(Jobs *jobs, int *needPrintPrompt);
 
 /* Commands */
 
@@ -175,7 +175,7 @@ void printCommand(Command *cmd);
 #endif
 
 int parseline(Context *, char *);
-void printMake(Context *cntx);
+void printPrompt(Context *cntx);
 void promptline(Context *, char *);
 void contextNull(Context *);
 int run(Context *, int);

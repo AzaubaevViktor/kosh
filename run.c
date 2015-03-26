@@ -21,9 +21,12 @@ int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
 
     // Forked
     if (0 != (chPid = fork())) {
-        Job *j = newJob(&cntx->jobs, chPid, chPid,
+        Job *j = newJob(&cntx->jobs, chPid, cmdName,
                         JOBBACKGROUND * isBackground(cmd));
-        debug(D_JOB, "Created new job with jid %%%d", j->jid);
+        if (j) {
+            debug(D_JOB, "Created new job with jid %%%d, `%s`", j->jid,
+                  j->cmdName);
+        }
 
         return chPid;
     }
@@ -67,12 +70,12 @@ int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
             close(pipeOld[0]);
         }
         if (isOutPip(cmd)) {
-        debug(D_PIPE, "for `%s`: OUT@ %d<-_%d_ @",
-              cmdName, pipeNew[0], pipeNew[1]);
-        close(pipeNew[0]);
-        dup2(pipeNew[1], STDOUT_FILENO);
-        close(pipeNew[1]);
-    }
+            debug(D_PIPE, "for `%s`: OUT@ %d<-_%d_ @",
+                  cmdName, pipeNew[0], pipeNew[1]);
+            close(pipeNew[0]);
+            dup2(pipeNew[1], STDOUT_FILENO);
+            close(pipeNew[1]);
+        }
     }
 
     execvpe(cmdName, cmd->cmdargs, environ);
@@ -93,8 +96,6 @@ int run(Context *cntx, int i) {
     static int pipeOld[2] = {-1, -1}, pipeNew[2] = {-1, -1};
     int j = 0;
 
-    updateJobs(&(cntx->jobs));
-
     for (j = 0; j < 2; j++) {
         if (-1 != pipeOld[j]) {
             close(pipeOld[j]);
@@ -109,6 +110,7 @@ int run(Context *cntx, int i) {
 
     if (builtinCmd) {
         builtinCmd(cmdName, cmd->cmdargs, environ);
+        printPrompt(cntx);
     } else {
         chPid = runChild(cntx, i, pipeOld, pipeNew);
         if (isBackground(cmd)) {
@@ -121,15 +123,6 @@ int run(Context *cntx, int i) {
     }
 
     // Parent
-//    int status = 0;
-//    debug(D_RUN,"PARENT: Children PID: {%d}, bckgr:%d",
-//          chPid, isBackground(cmd));
-//    if (!isBackground(cmd)) {
-//        debug(D_RUN, "Waiting for status from {%d}", chPid);
-//        waitpid(chPid, &status, 0);
-//        // tcsetpgrp called from signal handler
-//        debug(D_RUN, "PID {%d} closed with status: `%d`", chPid, status);
-//    }
 
     return 0;
 }

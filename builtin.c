@@ -58,7 +58,7 @@ int biJobs(char *name, char **args, char **environ) {
     Jobs *jobs = &cntx->jobs;
     Job *j = NULL;
 
-    updateJobs(jobs);
+    updateJobs(jobs, NULL);
 
     int i = 0;
 
@@ -70,8 +70,9 @@ int biJobs(char *name, char **args, char **environ) {
 
         j = &jobs->jobs[i];
         if (-1 != j->jid) {
-            printf("[%%%d] {%d} [%s|%s]\n",
+            printf("[%%%d] `%s` {%d} [%s|%s]\n",
                    j->jid,
+                   j->cmdName,
                    j->pid,
                    ISJOBBACKGROUND(j->flags) ? "backgr" : "foregr",
                    ISJOBSTOPPED(j->flags) ? "stopped" : "running");

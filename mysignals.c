@@ -12,20 +12,29 @@ void stopHandler(int i) {
 
 extern Context *cntx;
 
-void childHandler(int i) {
+void childDieHandler(int i) {
     int status = 0;
+    int needPrintPrompt = 0;
 
     debugSimple(D_SIGNALS, "Child change state");
 
-    pid_t pid = wait(&status);
-    if (pid != -1) {
-        Job *j = getJobByPid(&(cntx->jobs), pid);
-        if (j && ISJOBBACKGROUND(j->flags)) {
-            printf("Process with pid {%d} exited\n", pid);
-        } else {
-            printMake(cntx);
-        }
-        debug(D_RUN, "Child exited with status `%d`", status);
+//    pid_t pid = waitpid(-1, &status, 0);
+//    if (pid != -1) {
+//        Job *j = getJobByPid(&(cntx->jobs), pid);
+//        if (j && ISJOBBACKGROUND(j->flags)) {
+//            printf("Process with pid {%d} exited\n", pid);
+//        } else {
+//            printMake(cntx);
+//        }
+//        updateJobs(&(cntx->jobs));
+//        debug(D_RUN, "Child {%d} exited with status `%d`", pid, status);
+//    } else {
+//        debugSimple(D_RUN, "Returned pid is `-1`");
+//    }
+    updateJobs(&(cntx->jobs), &needPrintPrompt);
+
+    if (needPrintPrompt) {
+        printPrompt(cntx);
     }
 
     debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
@@ -49,8 +58,8 @@ void signalInit() {
     sigaddset (&block_mask, SIGINT);
     sigaddset (&block_mask, SIGTSTP);
     sigaddset (&block_mask, SIGCHLD);
-    setup_action.sa_handler = childHandler;
+    setup_action.sa_handler = childDieHandler;
     setup_action.sa_mask = block_mask;
-    setup_action.sa_flags = SA_NOCLDSTOP;
+    setup_action.sa_flags = SA_NOCLDSTOP || SA_NOCLDWAIT;
     sigaction (SIGCHLD, &setup_action, NULL);
 }

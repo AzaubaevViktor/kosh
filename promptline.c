@@ -9,7 +9,7 @@ void promptMake(Context *cntx, char* prompt) {
     sprintf(prompt, "[%s] {%d} %s>", cntx->argv[0], getpid(), ctime(&current));
 }
 
-void printMake(Context *cntx) {
+void printPrompt(Context *cntx) {
     static char prompt[1024];
     if (!cntx->fromFile) {
         promptMake(cntx, prompt);
@@ -23,7 +23,7 @@ void promptline(Context *cntx, char *line) {
     int n = 0;
     int ch;
 
-    printMake(cntx);
+   // printPrompt(cntx);
 
     while (1) {
         while (1) {

@@ -144,7 +144,7 @@ void addExitedPid(Jobs *jobs, pid_t pid);
 Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags);
 Job *getJobByJid(Jobs *jobs, int jid);
 Job *getJobByPid(Jobs *jobs, int pid);
-void updateJobs(Jobs *jobs, int *needPrintPrompt);
+void updateJobs(Jobs *jobs);
 
 /* Commands */
 
@@ -185,7 +185,7 @@ void printCommand(Command *cmd);
 
 int parseline(Context *, char *);
 void printPrompt(Context *cntx);
-void promptline(Context *, char *);
+void readCmds(Context *, char *);
 int run(Context *, int);
 void signalInit(void);
 

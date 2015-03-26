@@ -51,11 +51,10 @@ int main(int argc, char *argv[]) {
 
     signalInit();
 
-    // Костыль
     printPrompt(cntx);
 
     while (1) {
-        promptline(&lCntx, line);
+        readCmds(&lCntx, line);
 
         /* if eof  */
         if (*line == '\0') {
@@ -64,6 +63,7 @@ int main(int argc, char *argv[]) {
 
         if (parseline(&lCntx, line) <= 0)
             continue;   /* read next line */
+
 
         if (isShellError()) {
             printf("%s\n", getShellError());

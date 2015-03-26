@@ -102,35 +102,28 @@ Job *getJobByPid(Jobs *jobs, int pid) {
     return &(jobs->jobs[i]);
 }
 
-void _updateJob(Jobs *jobs, Job *j, int flags, int *needPrintPrompt) {
+void _updateJob(Jobs *jobs, Job *j, int flags) {
     j->flags = flags;
 
     if (ISJOBEND(flags)) {
         debug(D_JOB, "Job [%d] {%d} exited/killed", j->jid, j->pid);
         if (j && ISJOBBACKGROUND(j->flags)) {
             printf("Process with pid {%d} exited\n", j->pid);
-        } else {
-            if (needPrintPrompt != NULL) {
-                *needPrintPrompt = 1;
-            }
         }
         _deleteJob(jobs, j);
     }
 }
 
-void updateJobs(Jobs *jobs, int *needPrintPrompt) {
+void updateJobs(Jobs *jobs) {
     int status;
     pid_t pid = -1;
     Job *j = NULL;
     int flags = 0;
-    if (needPrintPrompt) {
-        *needPrintPrompt = 0;
-    }
 
     debugSimple(D_JOB, "Update jobs status");
     // waitpid returned -1 if error
     // 0 if children doesn't change status
-    while (0 < (pid = waitpid(-1, &status, WNOHANG))) {
+    while (0 < (pid = waitpid(-1, &status, WNOHANG | WUNTRACED))) {
         debug(D_JOB, "Job with pid {%d} change status", pid);
         j = getJobByPid(jobs, pid);
         if (!j) {
@@ -141,14 +134,18 @@ void updateJobs(Jobs *jobs, int *needPrintPrompt) {
         flags = j->flags;
         if (WIFEXITED(status)) {
             addExitedPid(jobs, pid);
+            debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
+            tcsetpgrp(0, getpgid(0));
             SETJOBFLAG(flags, JOBEND, 1);
         } elif (WIFSTOPPED(status)) {
             SETJOBFLAG(flags, JOBSTOPPED, 1);
+            debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
+            tcsetpgrp(0, getpgid(0));
         } elif (WIFCONTINUED(status)) {
             SETJOBFLAG(flags, JOBSTOPPED, 0);
         }
 
-        _updateJob(jobs, j, flags, needPrintPrompt);
+        _updateJob(jobs, j, flags);
     }
 }
 

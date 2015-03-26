@@ -19,7 +19,7 @@ void printPrompt(Context *cntx) {
 
 #define add_char { *(line + n) = (char) ch; n++; }
 
-void promptline(Context *cntx, char *line) {
+void readCmds(Context *cntx, char *line) {
     int n = 0;
     int ch;
 
@@ -27,7 +27,9 @@ void promptline(Context *cntx, char *line) {
 
     while (1) {
         while (1) {
-            while (-1 == (ch = getchar()));
+            while (-1 == (ch = getchar())) {
+                sleep(1);
+            }
             if (ch == '\n') {
                 add_char;
                 break;

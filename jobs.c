@@ -172,6 +172,7 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
         SETJOBFLAG(flags, JOBEND, 1);
     } elif (WIFSTOPPED(status)) {
         SETJOBFLAG(flags, JOBSTOPPED, 1);
+        SETJOBFLAG(flags, JOBBACKGROUND, 1);
         debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
         tcsetpgrp(0, getpgid(0));
     } elif (WIFCONTINUED(status)) {
@@ -185,7 +186,7 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
 }
 
 void waitForegroundJob(Jobs *jobs, pid_t pid) {
-    _waitJob(jobs, pid, 0);
+    _waitJob(jobs, pid, WUNTRACED);
 }
 
 void updateJobs(Jobs *jobs) {

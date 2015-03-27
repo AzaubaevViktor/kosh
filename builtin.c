@@ -25,15 +25,23 @@ int biSet(char *name, char **args, char **environ) {
     int argc = 0;
     static char *res_s[1024] = {0};
     for (argc = 0; args[argc]; argc++) {}
+
     if (3 == argc) {
         sprintf((char *) res_s, "%s=%s", args[1], args[2]);
         putenv((char *) res_s);
         return 0;
-    } else if (3 < argc) {
+    } elif (2 == argc) {
+        sprintf((char *) res_s, "%s=", args[1]);
+        putenv((char *) res_s);
+        return 0;
+    } elif (1 == argc) {
+        char **curenv = environ;
+        while (*curenv) {
+            printf("%s\n", *curenv);
+            curenv++;
+        }
+    } elif (3 < argc) {
         printf("To more arguments\n");
-        return 1;
-    } else if (3 > argc) {
-        printf("To few arguments\n");
         return 1;
     }
     return 0;

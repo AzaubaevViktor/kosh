@@ -116,7 +116,6 @@ int run(Context *cntx, int i) {
             debug(D_RUN, "DONT set foreground group {%d}, because process "
                          "is background", chPid);
         } else {
-            printf("Wait foreground {%d}\n", chPid);
             waitForegroundJob(&(cntx->jobs), chPid);
 
             debug(D_RUN, "Set foreground group {%d}", chPid);

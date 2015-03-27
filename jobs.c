@@ -57,7 +57,6 @@ void _deleteExitedPid(Jobs *jobs, pid_t pid) {
 }
 
 Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags) {
-    printf("New job pid {%d}\n", pid);
     if (_isPidInExitedPid(jobs, pid)) {
         debug(D_JOB, "Job with pid{%d} currently exited.", pid);
         if (ISJOBBACKGROUND(flags)) {
@@ -108,6 +107,11 @@ void _updateJob(Jobs *jobs, Job *j, int flags) {
 
     if (ISJOBEND(flags)) {
         debug(D_JOB, "Job [%d] {%d} exited/killed", j->jid, j->pid);
+
+        if (ISJOBBACKGROUND(flags)) {
+            printf("Job [%%%d] with pid {%d} exited\n", j->jid, j->pid);
+        }
+
         _deleteExitedPid(jobs, j->pid);
         _deleteJob(jobs, j);
     }
@@ -117,8 +121,6 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
     /* when job exited, first call updateJobs in signal handler, or
      * wait in run->waitPid
      */
-
-    printf("Wait {%d}\n", pid);
 
     int flags = 0;
     pid_t retPid = -1;

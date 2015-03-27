@@ -37,7 +37,7 @@
 
 /* debugs */
 
-#define _DEBUG_OFF
+#define DEBUG_OFF
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
@@ -167,7 +167,6 @@ typedef struct _Context {
 Context *cntx;
 
 void contextInit(Context *, int argc, char **argv);
-void contextInit(Context *cntx, int argc, char **argv);
 
 /* Builtin commands */
 

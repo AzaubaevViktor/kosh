@@ -4,8 +4,6 @@ void _jobNull(Job *j) {
     j->pid = 0;
     j->jid = -1;
     j->flags = 0;
-
-    memset(j->cmdName, 0, LINELEN * sizeof(char));
 }
 
 void jobsInit(Jobs *jobs) {
@@ -26,7 +24,7 @@ void _findNextEmptyJob(Jobs *jobs) {
     jobs->nextEmpty = i;
 }
 
-Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags) {
+Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
     debug(D_JOB, "Create new group with PGID {%d}", pid);
     if (setpgid(pid, pid) == -1) {
         perror("Cannot create new group");
@@ -46,7 +44,7 @@ Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags) {
     j->jid = ++(jobs->jobsCount);
     j->pid = pid;
     j->flags = flags;
-    strcpy(j->cmdName, cmdName);
+    makeCmdLine(cmd, j->cmdLine);
     return j;
 }
 

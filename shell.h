@@ -125,11 +125,12 @@
 #define SETJOBFLAG(flags, flag, value) \
     (flags = ((flags - ISFLAG(flags, flag) * flag) + (!!value) * flag))
 
+
 typedef struct _Job {
     int jid;
     pid_t pid;
-    char cmdName[LINELEN];
     int flags;
+    char cmdLine[LINELEN];
 } Job;
 
 typedef struct _Jobs {
@@ -138,8 +139,10 @@ typedef struct _Jobs {
     Job jobs[MAX_JOBS];
 } Jobs;
 
+typedef struct _Command Command;
+
 void jobsInit(Jobs *jobs);
-Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags);
+Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags);
 Job *getJobByJid(Jobs *jobs, int jid);
 Job *getJobByPid(Jobs *jobs, int pid);
 void waitForegroundJob(Jobs *jobs, pid_t pid);
@@ -165,7 +168,9 @@ typedef struct _Context {
 
 Context *cntx;
 
+void commandClean(Context *cntx);
 void contextInit(Context *, int argc, char **argv);
+void makeCmdLine(Command *cmd, char *line);
 
 /* Builtin commands */
 

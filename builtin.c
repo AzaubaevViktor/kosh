@@ -80,7 +80,7 @@ int biJobs(char *name, char **args, char **environ) {
         if (-1 != j->jid) {
             printf("[%%%d] `%s` {%d} [%s|%s]\n",
                    j->jid,
-                   j->cmdName,
+                   j->cmdLine,
                    j->pid,
                    ISJOBBACKGROUND(j->flags) ? "backgr" : "foregr",
                    ISJOBSTOPPED(j->flags) ? "stopped" : "running");

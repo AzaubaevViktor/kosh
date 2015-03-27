@@ -9,6 +9,19 @@ void _commandNull(Command *cmd) {
     }
 }
 
+void makeCmdLine(Command *cmd, char *cmdline) {
+    int i = 0;
+    int len = 0;
+    cmdline[0] = '\0';
+    while (cmd->cmdargs[i]) {
+        sprintf(cmdline + len, "%s", cmd->cmdargs[i]);
+        len += strlen(cmd->cmdargs[i]);
+        cmdline[len++] = ' ';
+        i++;
+    }
+    cmdline[--len] = '\0';
+}
+
 void commandClean(Context *cntx) {
     int i = 0;
     for (i = 0; i < MAXCMDS; i++) {

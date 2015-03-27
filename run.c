@@ -21,11 +21,11 @@ int _runChild(Context *cntx, int i) {
 
     // Forked
     if (0 != (chPid = fork())) {
-        Job *j = newJob(&cntx->jobs, chPid, cmdName,
+        Job *j = newJob(&cntx->jobs, chPid, cmd,
                         JOBBACKGROUND * isBackground(cmd));
         if (j) {
             debug(D_JOB, "Created new job with jid [%%%d], `%s`", j->jid,
-                  j->cmdName);
+                  j->cmdLine);
         }
 
         return chPid;
@@ -35,7 +35,6 @@ int _runChild(Context *cntx, int i) {
 
     debug(D_RUN, "CHILD forked. PID:{%d} PPID:{%d}", getpid(), getppid());
 
-    // set redirection
     {
         if (cmd->infile) {
             if ((err = redirection(cmd->infile,
@@ -73,7 +72,6 @@ int _runChild(Context *cntx, int i) {
 
     execvpe(cmdName, cmd->cmdargs, environ);
 
-    // TODO: Перенаправить вывод обратно в stdin
     debug(D_RUN, "Exec error. Set foreground group [%d] (parent)",
           getpgid(getppid()));
     tcsetpgrp(0, getpgid(getppid()));

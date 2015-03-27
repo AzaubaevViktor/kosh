@@ -24,20 +24,16 @@ int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
         Job *j = newJob(&cntx->jobs, chPid, cmdName,
                         JOBBACKGROUND * isBackground(cmd));
         if (j) {
-            debug(D_JOB, "Created new job with jid %%%d, `%s`", j->jid,
+            debug(D_JOB, "Created new job with jid [%%%d], `%s`", j->jid,
                   j->cmdName);
         }
 
         return chPid;
     }
 
-    debug(D_RUN, "CHILD forked. PID:{%d} PPID:{%d}", getpid(), getppid());
+    signalReset();
 
-    debug(D_RUN, "Create new group with PGID {%d}", getpgid(0));
-    if (setpgid(0, 0) == -1) {
-        perror("Cannot create new group");
-        exit(1);
-    }
+    debug(D_RUN, "CHILD forked. PID:{%d} PPID:{%d}", getpid(), getppid());
 
     // set redirection
     {
@@ -113,17 +109,12 @@ int run(Context *cntx, int i) {
     } else {
         chPid = runChild(cntx, i, pipeOld, pipeNew);
         if (isBackground(cmd)) {
-            debug(D_RUN, "DONT set foreground group {%d}, because process "
+            debug(D_RUN, "DONT set foreground group {{%d}}, because process "
                          "is background", chPid);
         } else {
-            debug(D_RUN, "Set foreground group {%d}", chPid);
-            tcsetpgrp(0, chPid);
-
             waitForegroundJob(&(cntx->jobs), chPid);
         }
     }
-
-    // Parent
 
     return 0;
 }

@@ -37,14 +37,14 @@
 
 /* debugs */
 
-#define DEBUG_OFF
+#define _DEBUG_OFF
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
 #define D_SIGNALS  1
 #define _D_BUILTIN  1
 #define _D_PARSER   1
-#define _D_RUN      1
+#define D_RUN      1
 #define _D_PIPE     1
 #define _D_TOKENS   1
 #define D_JOB      1
@@ -135,12 +135,10 @@ typedef struct _Job {
 typedef struct _Jobs {
     int nextEmpty;
     int jobsCount;
-    pid_t exitedPid[MAX_JOBS];
     Job jobs[MAX_JOBS];
 } Jobs;
 
 void jobsInit(Jobs *jobs);
-void addExitedPid(Jobs *jobs, pid_t pid);
 Job *newJob(Jobs *jobs, pid_t pid, char *cmdName, int flags);
 Job *getJobByJid(Jobs *jobs, int jid);
 Job *getJobByPid(Jobs *jobs, int pid);
@@ -183,11 +181,17 @@ int printContext(Context *cntx);
 void printCommand(Command *cmd);
 #endif
 
+/* Shell */
+
 int parseline(Context *, char *);
 void printPrompt(Context *cntx);
 void readCmds(Context *, char *);
 int run(Context *, int);
+
+/* Signals */
+
 void signalInit(void);
+void signalReset(void);
 
 #endif // SHELL_H
 

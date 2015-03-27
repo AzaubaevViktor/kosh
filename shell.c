@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
     signalInit();
 
     while (1) {
+        updateJobs(&(cntx->jobs));
         printPrompt(cntx);
         readCmds(&lCntx, line);
 

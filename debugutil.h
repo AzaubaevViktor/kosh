@@ -5,7 +5,7 @@
 
 #define debugSimple(type, msg) \
 if (1 == type) {\
-    printf(DEBUG_STR "`" __FILE__ ":%d`" msg "\n", #type, __LINE__); \
+    printf(DEBUG_STR "`" __FILE__ ":%d` " msg "\n", #type, __LINE__); \
 }
 
 #define debug(type, msg, ...) \

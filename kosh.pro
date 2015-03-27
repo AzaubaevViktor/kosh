@@ -27,5 +27,6 @@ HEADERS += \
 
 DISTFILES += \
     TODO.md \
-    test.ksh
+    test.ksh \
+    debug_output.txt
 

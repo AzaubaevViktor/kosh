@@ -27,9 +27,7 @@ void readCmds(Context *cntx, char *line) {
 
     while (1) {
         while (1) {
-            while (-1 == (ch = getchar())) {
-                sleep(1);
-            }
+            while (-1 == (ch = getchar()));
             if (ch == '\n') {
                 add_char;
                 break;

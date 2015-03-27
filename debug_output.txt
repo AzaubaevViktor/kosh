@@ -1,0 +1,4 @@
+[%d]    -- Job ID
+{d}     -- PID
+{{d}}   -- GPID
+`d`     -- some number

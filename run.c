@@ -116,10 +116,10 @@ int run(Context *cntx, int i) {
             debug(D_RUN, "DONT set foreground group {%d}, because process "
                          "is background", chPid);
         } else {
-            waitForegroundJob(&(cntx->jobs), chPid);
-
             debug(D_RUN, "Set foreground group {%d}", chPid);
             tcsetpgrp(0, chPid);
+
+            waitForegroundJob(&(cntx->jobs), chPid);
         }
     }
 

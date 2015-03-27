@@ -165,7 +165,7 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
 
     debug(D_JOB, "Job with pid {%d} change status", retPid);
 
-    if (WIFEXITED(status)) {
+    if (WIFEXITED(status) | WIFSIGNALED(status)) {
         addExitedPid(jobs, retPid);
         debug(D_RUN, "Set shell(gid[%d]) to foreground", getpgid(0));
         tcsetpgrp(0, getpgid(0));

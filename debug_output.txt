@@ -2,3 +2,5 @@
 {d}     -- PID
 {{d}}   -- GPID
 `d`     -- some number
+@d<-    -- read pip
+<-@d    -- write pip

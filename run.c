@@ -13,7 +13,7 @@ int redirection(char *filename, int flags, int to) {
     return 0;
 }
 
-int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
+int _runChild(Context *cntx, int i, int pipeIn, int pipeOut) {
     Command *cmd = &(cntx->cmds[i]);
     char *cmdName = cmd->cmdargs[0];
     int chPid = 0;
@@ -59,18 +59,15 @@ int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
             }
         }
         if (isInPip(cmd)) {
-            debug(D_PIPE,"for `%s`: IN@ _%d_<-%d @",
-                  cmdName, pipeOld[0], pipeOld[1]);
-            close(pipeOld[1]);
-            dup2(pipeOld[0], STDIN_FILENO);
-            close(pipeOld[0]);
+            debug(D_PIPE, "Use @%d<-", pipeIn);
+            dup2(pipeIn, STDIN_FILENO);
+            close(pipeIn);
         }
+
         if (isOutPip(cmd)) {
-            debug(D_PIPE, "for `%s`: OUT@ %d<-_%d_ @",
-                  cmdName, pipeNew[0], pipeNew[1]);
-            close(pipeNew[0]);
-            dup2(pipeNew[1], STDOUT_FILENO);
-            close(pipeNew[1]);
+            debug(D_PIPE, "Use <-@%d", pipeOut);
+            dup2(pipeOut, STDOUT_FILENO);
+            close(pipeOut);
         }
     }
 
@@ -99,24 +96,35 @@ int _run(Context *cntx, int i, bool closeAllPipes) {
     char *cmdName = cmd->cmdargs[0];
     BuiltinCmd *builtinCmd = getCmdByName(cmdName);
     int chPid = 0;
+    int pipeIn = -1;
+    int pipeOut = -1;
 
-    for (j = 0; j < 2; j++) {
-        if (-1 != pipeOld[j]) {
-            debug(D_PIPE, "Closed pipe @ %d @", pipeOld[j]);
-            close(pipeOld[j]);
-        }
-        pipeOld[j] = pipeNew[j];
+    if (isInPip(cmd)) {
+        debug(D_PIPE, "Use @%d<-", pipeOld[0]);
+        pipeIn = pipeOld[0];
+    } else {
+        debug(D_PIPE, "Close @%d<-", pipeOld[0]);
+        close(pipeOld[0]);
+    }
+    debug(D_PIPE, "Close <-@%d", pipeOld[1]);
+    close(pipeOld[1]);
+
+    if (isOutPip(cmd)) {
+        pipe2(pipeNew, 0);
+        debug(D_PIPE, "Create @%d<- <-@%d",pipeNew[0], pipeNew[1]);
+        pipeOut = pipeNew[1];
+    } else {
+        pipeNew[0] = pipeNew[1] = -1;
     }
 
-    if (isInPip(cmd) || isOutPip(cmd)) {
-        pipe2(pipeNew, 0);
-        debug(D_PIPE,"New pipe created: @ %d<-%d @", pipeNew[0], pipeNew[1]);
+    for (j = 0; j < 2; j++) {
+        pipeOld[j] = pipeNew[j];
     }
 
     if (builtinCmd) {
         builtinCmd(cmdName, cmd->cmdargs, environ);
     } else {
-        chPid = runChild(cntx, i, pipeOld, pipeNew);
+        chPid = _runChild(cntx, i, pipeIn, pipeOut);
         if (isBackground(cmd)) {
             debug(D_RUN, "DONT set foreground group {{%d}}, because process "
                          "is background", chPid);

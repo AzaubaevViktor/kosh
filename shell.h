@@ -151,6 +151,7 @@ typedef struct _Command {
     char *cmdargs[MAXARGS];
     char cmdflag;
     char *infile, *outfile, *appfile;
+    int pipeIn, pipeOut;
 } Command;
 
 typedef struct _Context {
@@ -187,7 +188,6 @@ int parseline(Context *, char *);
 void printPrompt(Context *cntx);
 void readCmds(Context *, char *);
 int run(Context *, int);
-void commandsEnd();
 
 /* Signals */
 

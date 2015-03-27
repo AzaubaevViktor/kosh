@@ -82,7 +82,6 @@ int main(int argc, char *argv[]) {
             }
 
         }
-        commandsEnd();
 
     }  /* close while */
     return 0;

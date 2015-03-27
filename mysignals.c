@@ -14,7 +14,7 @@ void signalInit() {
     signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
-    signal(SIGCHLD, stpHandler);
+    signal(SIGCHLD, SIG_DFL);
 }
 
 void signalReset() {

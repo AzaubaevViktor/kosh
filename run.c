@@ -84,16 +84,25 @@ int runChild(Context *cntx, int i, int pipeOld[2], int pipeNew[2]) {
     exit(EXIT_FAILURE);
 }
 
-int run(Context *cntx, int i) {
+int _run(Context *cntx, int i, bool closeAllPipes) {
+    int j = 0;
+    static int pipeOld[2] = {-1, -1}, pipeNew[2] = {-1, -1};
+    if (closeAllPipes) {
+        for (j = 0; j < 2; j++) {
+            close(pipeOld[j]);
+            close(pipeNew[j]);
+        }
+        return 0;
+    }
+
     Command *cmd = &(cntx->cmds[i]);
     char *cmdName = cmd->cmdargs[0];
     BuiltinCmd *builtinCmd = getCmdByName(cmdName);
     int chPid = 0;
-    static int pipeOld[2] = {-1, -1}, pipeNew[2] = {-1, -1};
-    int j = 0;
 
     for (j = 0; j < 2; j++) {
         if (-1 != pipeOld[j]) {
+            debug(D_PIPE, "Closed pipe @ %d @", pipeOld[j]);
             close(pipeOld[j]);
         }
         pipeOld[j] = pipeNew[j];
@@ -117,5 +126,13 @@ int run(Context *cntx, int i) {
     }
 
     return 0;
+}
+
+int run(Context *cntx, int i) {
+    return _run(cntx, i, false);
+}
+
+void commandsEnd() {
+    _run(NULL, 0, true);
 }
 

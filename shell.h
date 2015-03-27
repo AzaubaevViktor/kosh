@@ -41,13 +41,13 @@
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
-#define D_SIGNALS  1
+#define _D_SIGNALS  1
 #define _D_BUILTIN  1
 #define _D_PARSER   1
-#define D_RUN      1
-#define _D_PIPE     1
+#define _D_RUN      1
+#define D_PIPE     1
 #define _D_TOKENS   1
-#define D_JOB      1
+#define _D_JOB      1
 
 #ifndef D_MAIN
 #define D_MAIN 0
@@ -187,6 +187,7 @@ int parseline(Context *, char *);
 void printPrompt(Context *cntx);
 void readCmds(Context *, char *);
 int run(Context *, int);
+void commandsEnd();
 
 /* Signals */
 

@@ -13,6 +13,7 @@ void signalInit() {
     // TODO: with block
     signal(SIGINT, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
     signal(SIGCHLD, SIG_DFL);
 }
 
@@ -21,5 +22,7 @@ void signalReset() {
     signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_IGN);
     signal(SIGTTIN, SIG_DFL);
+    signal(SIGTSTP, SIG_DFL);
     signal(SIGCHLD, SIG_DFL);
 }
+

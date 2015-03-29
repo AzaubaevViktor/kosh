@@ -41,13 +41,13 @@
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
-#define _D_SIGNALS  1
+#define D_SIGNALS  1
 #define _D_BUILTIN  1
 #define _D_PARSER   1
-#define _D_RUN      1
-#define D_PIPE     1
+#define D_RUN      1
+#define _D_PIPE     1
 #define _D_TOKENS   1
-#define _D_JOB      1
+#define D_JOB      1
 
 #ifndef D_MAIN
 #define D_MAIN 0
@@ -125,12 +125,18 @@
 #define SETJOBFLAG(flags, flag, value) \
     (flags = ((flags - ISFLAG(flags, flag) * flag) + (!!value) * flag))
 
+#define LAST_JOB (-1)
+#define PRELAST_JOB (-2)
+
+#define NOT_FOUND_JOB (-3)
+#define AMBIGOUS_JOB (-4)
 
 typedef struct _Job {
     int jid;
     pid_t pid;
     int flags;
     char cmdLine[LINELEN];
+    int order;
 } Job;
 
 typedef struct _Jobs {
@@ -145,8 +151,12 @@ void jobsInit(Jobs *jobs);
 Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags);
 Job *getJobByJid(Jobs *jobs, int jid);
 Job *getJobByPid(Jobs *jobs, int pid);
+Job *getJobByLine(Jobs *jobs, char *line, int *error);
 void waitForegroundJob(Jobs *jobs, pid_t pid);
 void updateJobs(Jobs *jobs);
+void addOrderJob(Jobs *jobs, Job *job);
+void setLastOrderJob(Jobs *jobs, Job *job);
+void deleteOrderJob(Jobs *jobs, Job *job);
 
 /* Commands */
 

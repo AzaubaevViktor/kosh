@@ -44,6 +44,10 @@ int main(int argc, char *argv[]) {
 
     if (2 == argc) {
         int fd = open(argv[1], O_RDONLY);
+        if (-1 == fd) {
+            printf("Error open file %s\n", argv[1]);
+            exit(EXIT_FAILURE);
+        }
         dup2(fd, STDIN_FILENO);
         close(fd);
         lCntx.fromFile = true;

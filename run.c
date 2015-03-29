@@ -85,6 +85,9 @@ int run(Context *cntx, int i) {
     char *cmdName = cmd->cmdargs[0];
     BuiltinCmd *builtinCmd = getCmdByName(cmdName);
     int chPid = 0;
+    int waitPid = 0;
+
+    debug(D_RUN, "Run '%s'", cmdName);
 
     if (isInPip(cmd)) {
         debug(D_PIPE, "Use @%d<-", pipes[0]);
@@ -103,7 +106,10 @@ int run(Context *cntx, int i) {
     }
 
     if (builtinCmd) {
-        builtinCmd(cmdName, cmd->cmdargs, environ);
+        waitPid = builtinCmd(cmdName, cmd->cmdargs, environ);
+        if (waitPid > 0) {
+            waitForegroundJob(&(cntx->jobs), waitPid);
+        }
     } else {
         chPid = _runChild(cntx, i);
         if (isBackground(cmd)) {

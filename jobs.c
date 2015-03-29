@@ -4,6 +4,7 @@ void _jobNull(Job *j) {
     j->pid = 0;
     j->jid = -1;
     j->flags = 0;
+    j->order = 0;
 }
 
 void jobsInit(Jobs *jobs) {
@@ -22,6 +23,46 @@ void _findNextEmptyJob(Jobs *jobs) {
         i++;
     }
     jobs->nextEmpty = i;
+}
+
+void addOrderJob(Jobs *jobs, Job *job) {
+    Job *j = NULL;
+    int i = 0;
+
+    for (i = 0; i < MAX_JOBS; i++) {
+        j = &(jobs->jobs[i]);
+        if ((j != job) && (0 != j->order)) {
+            j->order--;
+        }
+    }
+
+    job->order = LAST_JOB;
+}
+
+void setLastOrderJob(Jobs *jobs, Job *job) {
+    Job *j = NULL;
+    int i = 0;
+
+    for (i = 0; i < MAX_JOBS; i++) {
+        j = &(jobs->jobs[i]);
+        if ((0 != j->order) && (j->order > job->order)) {
+            j->order--;
+        }
+    }
+
+    job->order = LAST_JOB;
+}
+
+void deleteOrderJob(Jobs *jobs, Job *job) {
+    Job *j = NULL;
+    int i = 0;
+
+    for (i = 0; i < MAX_JOBS; i++) {
+        j = &(jobs->jobs[i]);
+        if ((0 != j->order) && (j->order < job->order)) {
+            j->order++;
+        }
+    }
 }
 
 Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
@@ -44,7 +85,9 @@ Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
     j->jid = ++(jobs->jobsCount);
     j->pid = pid;
     j->flags = flags;
+    addOrderJob(jobs, j);
     makeCmdLine(cmd, j->cmdLine);
+
     return j;
 }
 
@@ -52,14 +95,24 @@ void _deleteJob(Jobs *jobs, Job *j) {
     if (jobs->nextEmpty > j->jid) {
         jobs->nextEmpty = j->jid;
     }
+    deleteOrderJob(jobs, j);
     j->jid = -1;
     jobs->jobsCount--;
 }
 
 Job *getJobByJid(Jobs *jobs, int jid) {
     int i = 0;
-    while(jobs->jobs[i].jid != jid) {
-        i++;
+    if (jid < 0) {
+        while((jobs->jobs[i].order != jid) && (i < MAX_JOBS)) {
+            i++;
+        }
+    } else {
+        while((jobs->jobs[i].jid != jid) && (i < MAX_JOBS)) {
+            i++;
+        }
+    }
+    if (i == MAX_JOBS) {
+        return NULL;
     }
     return &(jobs->jobs[i]);
 }
@@ -75,12 +128,50 @@ Job *getJobByPid(Jobs *jobs, int pid) {
     return &(jobs->jobs[i]);
 }
 
+Job *getJobByLine(Jobs *jobs, char *line, int *error) {
+    Job *job = NULL;
+    Job *fJob = NULL;
+    int counter = 0;
+    int i = 0;
+
+    if (!line) {
+        return NULL;
+    }
+
+    for (i = 0; i < MAX_JOBS; i++) {
+        job = &(jobs->jobs[i]);
+        if (-1 == job->jid) {
+            job = NULL;
+            continue;
+        }
+
+        if (job->cmdLine != strstr(job->cmdLine, line)) {
+            job = NULL;
+            continue;
+        } else {
+            counter++;
+            fJob = job;
+            continue;
+        }
+    }
+
+    if (counter == 0) {
+        *error = NOT_FOUND_JOB;
+    } elif (counter == 1) {
+        return fJob;
+    } else {
+        *error = AMBIGOUS_JOB;
+    }
+
+    return NULL;
+}
+
 void _updateJob(Jobs *jobs, Job *j, int flags) {
     j->flags = flags;
 
     if (ISJOBEND(flags)) {
         if (ISJOBBACKGROUND(flags)) {
-            printf("Job [%%%d] with pid {%d} exited\n", j->jid, j->pid);
+            printf("Job [%%%d] '%s' with pid {%d} exited\n", j->jid, j->cmdLine, j->pid);
         }
 
         _deleteJob(jobs, j);
@@ -132,6 +223,10 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
     } elif (WIFCONTINUED(status)) {
         debug(D_JOB, "Job [%%%d] {%d} continued", j->jid, j->pid);
         SETJOBFLAG(flags, JOBSTOPPED, 0);
+        _updateJob(jobs, j, flags);
+        if (!ISJOBBACKGROUND(j->flags)) {
+            return _waitJob(jobs, pid, options);
+        }
     }
 
     if (j) {
@@ -141,7 +236,7 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
 }
 
 void waitForegroundJob(Jobs *jobs, pid_t pid) {
-    _waitJob(jobs, pid, WUNTRACED);
+    _waitJob(jobs, pid, WUNTRACED | WCONTINUED);
 }
 
 void updateJobs(Jobs *jobs) {

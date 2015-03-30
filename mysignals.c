@@ -20,7 +20,7 @@ void signalInit() {
 void signalReset() {
     debug(D_SIGNALS, "Reset signal handlers for {%d}", getpid());
     signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_IGN);
+    signal(SIGQUIT, SIG_DFL);
     signal(SIGTTIN, SIG_DFL);
     signal(SIGTSTP, SIG_DFL);
     signal(SIGCHLD, SIG_DFL);

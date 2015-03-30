@@ -125,7 +125,7 @@ int biBg(char *name, char **args, char **environ) {
     printf("Set backround job [%%%d] '%s'\n", job->jid, job->cmdLine);
     debug(D_SIGNALS, "Send SIGCONT to %d", job->pid);
     kill(job->pid, SIGCONT);
-    return 0;
+    return job->pid;
 }
 
 int biJobs(char *name, char **args, char **environ) {

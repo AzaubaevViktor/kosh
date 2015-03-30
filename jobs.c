@@ -215,6 +215,7 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
         SETJOBFLAG(flags, JOBEND, 1);
     } elif (WIFSTOPPED(status)) {
         debug(D_JOB, "Job [%%%d] {%d} stopped", j->jid, j->pid);
+        fprintf(stderr, "Job [%%%d] {%d} stopped\n", j->jid, j->pid);
         SETJOBFLAG(flags, JOBSTOPPED, 1);
         SETJOBFLAG(flags, JOBBACKGROUND, 1);
         debug(D_RUN, "Set shell(gid{{%d}}) to foreground", getpgid(0));
@@ -222,10 +223,6 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
     } elif (WIFCONTINUED(status)) {
         debug(D_JOB, "Job [%%%d] {%d} continued", j->jid, j->pid);
         SETJOBFLAG(flags, JOBSTOPPED, 0);
-        _updateJob(jobs, j, flags);
-        if (!ISJOBBACKGROUND(j->flags)) {
-            return _waitJob(jobs, pid, options);
-        }
     }
 
     if (j) {

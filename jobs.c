@@ -80,9 +80,9 @@ Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
         }
     }
 
-    _findNextEmptyJob(jobs);
     Job *j = &(jobs->jobs[jobs->nextEmpty]);
-    j->jid = ++(jobs->jobsCount);
+    j->jid = jobs->nextEmpty + 1;
+    _findNextEmptyJob(jobs);
     j->pid = pid;
     j->flags = flags;
     addOrderJob(jobs, j);
@@ -92,8 +92,8 @@ Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
 }
 
 void _deleteJob(Jobs *jobs, Job *j) {
-    if (jobs->nextEmpty > j->jid) {
-        jobs->nextEmpty = j->jid;
+    if (jobs->nextEmpty > (j->jid - 1)) {
+        jobs->nextEmpty = j->jid - 1;
     }
     deleteOrderJob(jobs, j);
     j->jid = -1;
@@ -107,9 +107,7 @@ Job *getJobByJid(Jobs *jobs, int jid) {
             i++;
         }
     } else {
-        while((jobs->jobs[i].jid != jid) && (i < MAX_JOBS)) {
-            i++;
-        }
+        i = jid - 1;
     }
     if (i == MAX_JOBS) {
         return NULL;
@@ -119,11 +117,11 @@ Job *getJobByJid(Jobs *jobs, int jid) {
 
 Job *getJobByPid(Jobs *jobs, int pid) {
     int i = 0;
-    while(jobs->jobs[i].pid != pid) {
+    while ((jobs->jobs[i].pid != pid) && (i < MAX_JOBS)) {
         i++;
-        if (MAX_JOBS == i) {
-            return NULL;
-        }
+    }
+    if (i == MAX_JOBS) {
+        return NULL;
     }
     return &(jobs->jobs[i]);
 }
@@ -138,7 +136,7 @@ Job *getJobByLine(Jobs *jobs, char *line, int *error) {
         return NULL;
     }
 
-    for (i = 0; i < MAX_JOBS; i++) {
+    for (i = 0; (i < MAX_JOBS) && (counter < 2); i++) {
         job = &(jobs->jobs[i]);
         if (-1 == job->jid) {
             job = NULL;

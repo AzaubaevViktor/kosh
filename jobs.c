@@ -79,6 +79,7 @@ Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
             exit(EXIT_FAILURE);
         }
     }
+    jobs->jobsCount++;
 
     Job *j = &(jobs->jobs[jobs->nextEmpty]);
     j->jid = jobs->nextEmpty + 1;

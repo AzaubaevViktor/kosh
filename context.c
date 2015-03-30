@@ -34,6 +34,7 @@ void contextInit(Context *cntx, int argc, char **argv) {
     cntx->argc = argc;
     cntx->argv = argv;
     cntx->fromFile = false;
+    cntx->gInp = NULL;
     jobsInit(&(cntx->jobs));
 
     commandClean(cntx);

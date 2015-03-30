@@ -39,18 +39,18 @@ int main(int argc, char *argv[]) {
     char line[LINELEN];
     Context lCntx;
     cntx = &lCntx;
+    FILE *gInp = NULL;
 
     contextInit(&lCntx, argc, argv);
 
     if (2 == argc) {
-        int fd = open(argv[1], O_RDONLY);
-        if (-1 == fd) {
+        gInp = fopen(argv[1], "rt");
+        if (!gInp) {
             printf("Error open file %s\n", argv[1]);
             exit(EXIT_FAILURE);
         }
-        dup2(fd, STDIN_FILENO);
-        close(fd);
-        lCntx.fromFile = true;
+        cntx->gInp = gInp;
+        cntx->fromFile = true;
     }
 
     signalInit();
@@ -58,14 +58,14 @@ int main(int argc, char *argv[]) {
     while (1) {
         updateJobs(&(cntx->jobs));
         printPrompt(cntx);
-        readCmds(&lCntx, line);
+        readCmds(cntx, line);
 
         /* if eof  */
         if (*line == '\0') {
             continue;
         }
 
-        if (parseline(&lCntx, line) <= 0)
+        if (parseline(cntx, line) <= 0)
             continue;   /* read next line */
 
 
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
         debug(D_COMMANDS, "", printContext(&lCntx));
 
-        for (i = 0; i < lCntx.ncmds; i++) {
+        for (i = 0; i < cntx->ncmds; i++) {
 
             debug(D_MAIN,"Run `%s`", lCntx.cmds[i].cmdargs[0]);
             run(&lCntx, i);

@@ -6,6 +6,7 @@ int redirection(char *filename, int flags, int to) {
     int fileDesc = open(filename, flags, 0644);
     if (-1 == fileDesc) {
         printf("%s\n", getErrorStr(FileOpenError));
+        return 0;
     }
     shellErrorRet(-1 == fileDesc, FileOpenError);
     dup2(fileDesc, to);

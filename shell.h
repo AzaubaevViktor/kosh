@@ -37,7 +37,7 @@
 
 /* debugs */
 
-#define _DEBUG_OFF
+#define DEBUG_OFF
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
@@ -173,6 +173,7 @@ typedef struct _Context {
     int argc;
     char **argv;
     Jobs jobs;
+    FILE *gInp;
     bool fromFile;
 } Context;
 
@@ -201,7 +202,7 @@ void printCommand(Command *cmd);
 
 int parseline(Context *, char *);
 void printPrompt(Context *cntx);
-void readCmds(Context *, char *);
+void readCmds(Context *cntx, char *line);
 int run(Context *, int);
 
 /* Signals */

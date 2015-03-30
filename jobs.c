@@ -76,7 +76,7 @@ Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
         debug(D_JOB, "Set foreground group {%d}", pid);
         if (tcsetpgrp(STDIN_FILENO, pid) == -1) {
             perror("Cannot set foreground group");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
 

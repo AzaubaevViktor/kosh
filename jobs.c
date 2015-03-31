@@ -5,6 +5,8 @@ void _jobNull(Job *j) {
     j->jid = -1;
     j->flags = 0;
     j->order = 0;
+    j->pipeIn = -1;
+    j->pipeOut = -1;
 }
 
 void jobsInit(Jobs *jobs) {
@@ -86,8 +88,11 @@ Job *newJob(Jobs *jobs, pid_t pid, Command *cmd, int flags) {
     _findNextEmptyJob(jobs);
     j->pid = pid;
     j->flags = flags;
+    j->pipeIn = cmd->pipeIn;
+    j->pipeOut = cmd->pipeOut;
     addOrderJob(jobs, j);
     makeCmdLine(cmd, j->cmdLine);
+
 
     return j;
 }
@@ -173,6 +178,15 @@ void _updateJob(Jobs *jobs, Job *j, int flags) {
             printf("Job [%%%d] '%s' with pid {%d} exited\n", j->jid, j->cmdLine, j->pid);
         }
 
+        if (-1 != j->pipeOut) {
+            debug(D_PIPE, "Close <-@%d", j->pipeOut);
+            close(j->pipeOut);
+        }
+        if (-1 != j->pipeIn) {
+            debug(D_PIPE, "Close @%d<-", j->pipeIn);
+            close(j->pipeIn);
+        }
+
         _deleteJob(jobs, j);
     }
 }
@@ -210,8 +224,10 @@ pid_t _waitJob(Jobs *jobs, pid_t pid, int options) {
 
     if (WIFEXITED(status) | WIFSIGNALED(status)) {
         debug(D_JOB, "Job [%%%d] {%d} exited/killed", j->jid, j->pid);
-        debug(D_RUN, "Set shell(gid{{%d}}) to foreground", getpgid(0));
-        tcsetpgrp(0, getpgid(0));
+        if (!ISJOBBACKGROUND(j->flags) && !ISJOBCONVEYOR(j->flags)) {
+            debug(D_RUN, "Set shell(gid{{%d}}) to foreground", getpgid(0));
+            tcsetpgrp(0, getpgid(0));
+        }
         SETJOBFLAG(flags, JOBEND, 1);
     } elif (WIFSTOPPED(status)) {
         debug(D_JOB, "Job [%%%d] {%d} stopped", j->jid, j->pid);

@@ -37,7 +37,7 @@
 
 /* debugs */
 
-#define DEBUG_OFF
+#define _DEBUG_OFF
 
 #define _D_MAIN     1
 #define _D_COMMANDS 1
@@ -45,7 +45,7 @@
 #define _D_BUILTIN  1
 #define _D_PARSER   1
 #define D_RUN      1
-#define _D_PIPE     1
+#define D_PIPE     1
 #define _D_TOKENS   1
 #define D_JOB      1
 
@@ -115,12 +115,14 @@
 #define JOBSTOPPED (1)
 #define JOBBACKGROUND (2)
 #define JOBEND (4)
+#define JOBCONVEYOR (8)
 
 #define ISFLAG(flags, flag) (!!(flags & flag))
 
 #define ISJOBSTOPPED(flags) ISFLAG(flags, JOBSTOPPED)
 #define ISJOBBACKGROUND(flags) ISFLAG(flags, JOBBACKGROUND)
 #define ISJOBEND(flags) ISFLAG(flags, JOBEND)
+#define ISJOBCONVEYOR(flags) ISFLAG(flags, JOBCONVEYOR)
 
 #define SETJOBFLAG(flags, flag, value) \
     (flags = ((flags - ISFLAG(flags, flag) * flag) + (!!value) * flag))
@@ -137,6 +139,7 @@ typedef struct _Job {
     int flags;
     char cmdLine[LINELEN];
     int order;
+    int pipeIn, pipeOut;
 } Job;
 
 typedef struct _Jobs {

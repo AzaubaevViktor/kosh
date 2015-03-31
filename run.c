@@ -22,13 +22,6 @@ int _runChild(Context *cntx, int i) {
 
     // Forked
     if (0 != (chPid = fork())) {
-        Job *j = newJob(&cntx->jobs, chPid, cmd,
-                        JOBBACKGROUND * isBackground(cmd));
-        if (j) {
-            debug(D_JOB, "Created new job with jid [%%%d], `%s`", j->jid,
-                  j->cmdLine);
-        }
-
         return chPid;
     }
 
@@ -113,19 +106,17 @@ int run(Context *cntx, int i) {
         }
     } else {
         chPid = _runChild(cntx, i);
+        Job *j = newJob(&cntx->jobs, chPid, cmd,
+                        JOBBACKGROUND * isBackground(cmd));
+        debug(D_JOB, "Created new job with jid [%%%d], `%s`", j->jid,
+              j->cmdLine);
+
         if (isBackground(cmd)) {
             debug(D_RUN, "DONT set foreground group {{%d}}, because process "
                          "is background", chPid);
         } else {
             waitForegroundJob(&(cntx->jobs), chPid);
-            if (-1 != cmd->pipeOut) {
-                debug(D_PIPE, "Close <-@%d", cmd->pipeOut);
-                close(cmd->pipeOut);
-            }
-            if (-1 != cmd->pipeIn) {
-                debug(D_PIPE, "Close @%d<-", cmd->pipeIn);
-                close(cmd->pipeIn);
-            }
+
         }
     }
 
